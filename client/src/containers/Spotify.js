@@ -17,7 +17,7 @@ const styles = {
   root: {
     flexGrow: 1,
   }
-  };
+};
 
 
 class Spotify extends Component {
@@ -117,8 +117,11 @@ class Spotify extends Component {
     };
   }
 
-  play(trackId){
-    const deviceId = '20fae3a72cc0451c4d07b22abd5e662404b9fd35';
+  play = (trackId) => {
+    const {
+      deviceId,
+    } = this.state;
+
     console.log(`Playing on device: ${deviceId}`);
     spotifyApi.fetchTrack(deviceId, trackId);
   }
@@ -137,7 +140,7 @@ class Spotify extends Component {
 
   seek(position) {
     player.seek(position * 1000).then(() => {
-      console.log('Changed position to ' + position);
+      console.log('Changed position to ' + position + ' seconds');
     });
   }
 

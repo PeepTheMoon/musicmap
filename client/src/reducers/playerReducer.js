@@ -24,6 +24,11 @@ export default (state = initialState, action) => {
           ...action.payload,
         }
       };
+    case PLAYER.CHANGE_PLAYER_TYPE:
+      return {
+        ...state,
+        ...action.payload,
+      };
     default:
       return state;
   }

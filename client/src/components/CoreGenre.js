@@ -372,7 +372,17 @@ class CoreGenre extends Component {
     }
   }
   render(){
-    const { classes } = this.props;
+    const { classes, playerType } = this.props;
+
+    let playerContainer;
+    switch (playerType) {
+      case 'spotify':
+        playerContainer = <Spotify />;
+        break;
+      default:
+        playerContainer = <Spotify />;
+    }
+
     return (
       <>
       <div className={classes.subGenreContainer}>
@@ -428,7 +438,9 @@ class CoreGenre extends Component {
             message={<span id="message-id">Action registered successfully</span>} />
         </Paper>
       </div>
-      {(this.state.showPlayer || window.location.href.includes("callback/")) ? <Spotify /> : null}
+      {(this.state.showPlayer || window.location.href.includes("callback/")) ? (
+          playerContainer
+        ) : null}
       <AddNewTrack show={this.state.showNewTrackForm} />
     </>
     );
@@ -436,14 +448,19 @@ class CoreGenre extends Component {
 
 }
 
+const mapStateToProps = (state) => ({
+  playerType: state.player.playerType,
+});
 
 const mapDispatchToProps = {
   updateCurrentTrack: updateCurrentTrackAction,
-}
+};
+
 CoreGenre.propTypes = {
   classes: PropTypes.object.isRequired,
   updateCurrentTrack: PropTypes.func,
+  playerType: PropTypes.string,
 };
 
 
-export default withStyles(styles)(connect(null, mapDispatchToProps)(CoreGenre));
+export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(CoreGenre));
