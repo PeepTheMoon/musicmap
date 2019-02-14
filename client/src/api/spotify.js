@@ -2,7 +2,7 @@
 import config from '../providerConfig';
 import SpotifyWebApi from 'spotify-web-api-js';
 const spotifyTokenStorageKey = 'mm_spotify_token',
-        spotifyExpiryStorageKey = 'mm_spotify_expiry'; 
+        spotifyExpiryStorageKey = 'mm_spotify_expiry';
 
 const { authUrl, redirectUrl, clientId, scopes } = config.spotify;
 
@@ -20,11 +20,11 @@ export default class SpotifyApi {
             },
         });
     }
-    
+
     authorize(){
          //check if user has denied access to Spotify
          if(!window.location.href.includes('?error=access_denied')){
-                    
+
             //check if we have valid token
             if(!this.isTokenValid()){
                 console.log("invalid token")
@@ -34,8 +34,8 @@ export default class SpotifyApi {
             }
             //check if user has authenticated with Spotify
             if(window.location.href.includes('#access_token')){
-                this.storeTokenAndExpiry();    
-            }  
+                this.storeTokenAndExpiry();
+            }
         }
         else {
             console.log("Access Denied by User");
@@ -49,27 +49,27 @@ export default class SpotifyApi {
                 name: 'Ocean Protocol\'s Music Map',
                 getOAuthToken: cb => { cb(token); }
             });
-        
+
             // Error handling
             player.addListener('initialization_error', ({ message }) => { console.error(message); });
             player.addListener('authentication_error', ({ message }) => { console.error("Auth : " + message); });
             player.addListener('account_error', ({ message }) => { console.error(message); });
             player.addListener('playback_error', ({ message }) => { console.error(message); });
-        
+
             // Playback status updates
             player.addListener('player_state_changed', state => { console.log(state); });
-        
+
             // Ready
             player.addListener('ready', ({ device_id }) => {
                 console.log('Ready with Device ID', device_id);
                 this.play('1geovaCdfs5fSa4NNgFPVe');
             });
-        
+
             // Not Ready
             player.addListener('not_ready', ({ device_id }) => {
                 console.log('Device ID has gone offline', device_id);
             });
-        
+
             // Connect to the player!
             return player.connect();
         };
@@ -79,17 +79,17 @@ export default class SpotifyApi {
         let url = `${authUrl}?response_type=token` +
         `&client_id=${clientId}` +
         `${scopes ? '&scope=' + encodeURIComponent(scopes) : ''}` +
-        `&redirect_uri=${encodeURIComponent(redirectUrl)}`  
-        
+        `&redirect_uri=${encodeURIComponent(redirectUrl)}`
+
         window.location = url;
     }
-    
+
     storeTokenAndExpiry(){
         let params = this.getHashParamsFromCurrentUrl();
         let accessToken = params['access_token'];
         let expiry = new Date(new Date().getTime() + parseInt(params['expires_in'])).getTime()
-        localStorage.setItem(spotifyTokenStorageKey, accessToken); 
-        localStorage.setItem(spotifyExpiryStorageKey, expiry);  
+        localStorage.setItem(spotifyTokenStorageKey, accessToken);
+        localStorage.setItem(spotifyExpiryStorageKey, expiry);
     }
 
     getHashParamsFromCurrentUrl(){
@@ -103,10 +103,10 @@ export default class SpotifyApi {
     }
 
     isTokenValid(){
-       
+
         if(this.getTokenExpiry() != null){
             let expiry = this.getTokenExpiry();
-           
+
             if(expiry === (null || undefined)){
                 return false;
             }
@@ -117,8 +117,8 @@ export default class SpotifyApi {
             }
             return true;
         }
-        
-        
+
+
         return false;
     }
 
@@ -142,4 +142,4 @@ export default class SpotifyApi {
         return localStorage.getItem(spotifyExpiryStorageKey);
     }
 }
- 
+

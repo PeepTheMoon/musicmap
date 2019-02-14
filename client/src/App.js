@@ -24,7 +24,7 @@ class App extends Component {
   constructor(props){
     super(props);
     this.state = {
-     
+
     }
   }
 
@@ -33,12 +33,12 @@ class App extends Component {
       'https://use.fontawesome.com/releases/v5.1.0/css/all.css',
       document.querySelector('#insertion-point-jss'),
     );
-    
+
   }
 
   render() {
     return (
-     
+
       <Provider store={store}>
        <>
         <Router>
@@ -47,16 +47,16 @@ class App extends Component {
             <Route exact path='/auth' component={Auth} />
             <Route exact path='/auth/**' component={Auth} />
             <Route exact path='/logout' component={Logout} />
-            {/* <Route path='/callback' component={CoreGenre} /> */}
-            {/* <Route path='/spotify' component={CoreGenre} /> */}
+            <Route path='/callback' component={CoreGenre} />
+            <Route path='/spotify' component={CoreGenre} />
             <ProtectedRoute exact path='/u/profile' component={Profile} />
             <Route path='*' component={NotFound} />
           </Switch>
-        </Router>  
-        
+        </Router>
+
       </>
       </Provider>
-      
+
     );
   }
 }

@@ -13,7 +13,7 @@ export default class Auth {
             })
         });
         const data = await resp.json();
-        if (resp.status == 200) {
+        if (resp.status === 200) {
             const user = {
                 token: data.token,
                 user: data.user
@@ -34,7 +34,7 @@ export default class Auth {
         // returns whether username is available or not
         const resp = await fetch(`http://localhost:4000/available?username=${username}`);
         const data = await resp.json();
-        if (resp.status == 200) {
+        if (resp.status === 200) {
             return { err: null, res: data.message }
         }
         else {

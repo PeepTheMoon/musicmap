@@ -1,10 +1,12 @@
 import { PLAYER } from './types';
 
-let year = '2015'
-export const updateCurrentTrack =  () => dispatch => {
-    console.log("Actions : playerActions")
-    return dispatch({
-        type: PLAYER.CURRENT_TRACK,
-        payload: year
-    });   
+export const updateCurrentTrack =  (currentTrack, playerType = 'spotify') => dispatch => {
+  console.log("Actions : playerActions")
+  return dispatch({
+    type: PLAYER.CURRENT_TRACK,
+    payload: {
+      ...currentTrack,
+      playerType,
+    },
+  });
 }

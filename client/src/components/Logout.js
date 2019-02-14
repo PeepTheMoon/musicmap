@@ -9,10 +9,6 @@ import './Login.css';
 const auth = new Auth();
 
 class Logout extends Component {
-    constructor() {
-        super();
-    }
-
     componentWillMount() {
         auth.logout();
         this.props.logoutUser();
