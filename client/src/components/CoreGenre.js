@@ -23,7 +23,10 @@ import {
 import classNames from 'classnames';
 import green from '@material-ui/core/colors/green';
 import LongMenu from './LongMenu';
-import { updateCurrentTrack as updateCurrentTrackAction } from '../actions/playerAction';
+import {
+  updateCurrentTrack as updateCurrentTrackAction,
+  storeAllTracks as storeAllTracksAction,
+} from '../actions/playerAction';
 
 const token = 'BQCEgGDO5KKUuD6BvfR1vQdASUPFHOx0AIFHjrra0Jr5PnY1mZ2gBsdWFPFi49iXsgYcPxQSeUODTyMTEQhDmHa9-xKl5sneO2thYO-Ich0RWWucIboeE8Jp2e-2pFpFT9MQPKZmKjKdzpiCNnkWWbUG3P5w43-6LKZVf6pqvyT3qB2k1TUtfeEX';
 const buttonGradientBackground = 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)';
@@ -204,12 +207,13 @@ class CoreGenre extends Component {
   }
 
   async fetchAllTracks(){
+    const { storeAllTracks } = this.props;
+
     fetch(`http://localhost:4000/tracks`)
     .then(resp => resp.json())
     .then(data => {
-      console.log(data)
-      this.setState({
-        tracks: data.tracks.map(item => {
+      const tracks =
+        data.tracks.map(item => {
           return {
             trackId: item.trackId,
             album: item.album,
@@ -218,16 +222,30 @@ class CoreGenre extends Component {
             artists: item.artists,
             duration: item.duration
           }
-        }),
-        totalDuration : this.calculateTotalDuration(data.tracks)
-      })
+        });
+      storeAllTracks(tracks);
+
+      this.setState({
+        totalDuration: this.calculateTotalDuration(data.tracks)
+      });
     });
   }
 
   /**
-   * stream data from spotify if you have correct access token
    * @param {track object} track
    */
+  playTrack = (track) => {
+    const { playerType } = this.props;
+
+    switch (playerType) {
+      case 'spotify':
+        this.playItOnSpotify(track);
+        break;
+      default:
+        this.playItOnSpotify(track);
+    };
+  }
+
   playItOnSpotify = (track) => {
     const { updateCurrentTrack } = this.props;
 
@@ -322,9 +340,10 @@ class CoreGenre extends Component {
   }
 
   renderTracks() {
-    const { classes } = this.props;
+    const { classes, tracks: loadedTracks } = this.props;
 
-    if(this.state.tracks.length > 0){
+    const tracks = loadedTracks || [];
+    if(tracks.length > 0){
       return (
         <Table className={classes.playlistTable}>
           <TableHead>
@@ -340,11 +359,11 @@ class CoreGenre extends Component {
             </TableRow>
           </TableHead>
           <TableBody className={classes.playlistBody}>
-          {this.state.tracks.map(track => {
+          {tracks.map(track => {
             return (
             <TableRow className={classes.itemRow} key={track.trackId}>
               <TableCell className={classes.emptyCell}>&nbsp;</TableCell>
-              <TableCell> <Icon onClick={() => this.playItOnSpotify(track)} className={classNames(classes.icon, 'fa fa-play-circle fa-2x')} /></TableCell>
+              <TableCell> <Icon onClick={() => this.playTrack(track)} className={classNames(classes.icon, 'fa fa-play-circle fa-2x')} /></TableCell>
               <TableCell>{track.title}</TableCell>
               <TableCell>{track.artists}</TableCell>
               <TableCell>{track.album}</TableCell>
@@ -441,15 +460,19 @@ class CoreGenre extends Component {
 
 const mapStateToProps = (state) => ({
   playerType: state.player.playerType,
+  tracks: state.player.tracks,
 });
 
 const mapDispatchToProps = {
   updateCurrentTrack: updateCurrentTrackAction,
+  storeAllTracks: storeAllTracksAction,
 };
 
 CoreGenre.propTypes = {
   classes: PropTypes.object.isRequired,
+  tracks: PropTypes.arrayOf(PropTypes.object),
   updateCurrentTrack: PropTypes.func,
+  storeAllTracks: PropTypes.func,
   playerType: PropTypes.string,
 };
 

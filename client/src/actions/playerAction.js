@@ -9,6 +9,15 @@ export const updateCurrentTrack = (currentTrack) => dispatch => {
   });
 };
 
+export const storeAllTracks = (tracks) => dispatch => {
+  return dispatch({
+    type: PLAYER.STORE_ALL_TRACKS,
+    payload: {
+      tracks,
+    },
+  })
+}
+
 export const updateCurrentPlayer = (playerType) => dispatch => {
   return dispatch({
     type: PLAYER.CHANGE_PLAYER_TYPE,

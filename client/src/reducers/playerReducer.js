@@ -22,8 +22,13 @@ export default (state = initialState, action) => {
         ...state,
         currentTrack: {
           ...action.payload,
-        }
+        },
       };
+    case PLAYER.STORE_ALL_TRACKS:
+      return {
+        ...state,
+        tracks: action.payload.tracks,
+      }
     case PLAYER.CHANGE_PLAYER_TYPE:
       return {
         ...state,
