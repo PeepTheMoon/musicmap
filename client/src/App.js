@@ -10,7 +10,6 @@ import {
 } from 'react-router-dom'
 import ProtectedRoute from './components/ProtectedRoute';
 import NotFound from './components/NotFound';
-import Spotify from './containers/Spotify';
 import MusicPlayer from './components/MusicPlayer';
 import CoreGenre from './components/CoreGenre';
 import Logout from './components/Logout';
