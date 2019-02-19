@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Spotify from '../containers/Spotify';
+import PlayerContainer from '../containers/players/PlayerContainer';
 import AddNewTrack from './AddNewTrack';
 import { withStyles } from '@material-ui/core/styles';
 import {
@@ -374,15 +374,6 @@ class CoreGenre extends Component {
   render(){
     const { classes, playerType } = this.props;
 
-    let playerContainer;
-    switch (playerType) {
-      case 'spotify':
-        playerContainer = <Spotify />;
-        break;
-      default:
-        playerContainer = <Spotify />;
-    }
-
     return (
       <>
       <div className={classes.subGenreContainer}>
@@ -439,7 +430,7 @@ class CoreGenre extends Component {
         </Paper>
       </div>
       {(this.state.showPlayer || window.location.href.includes("callback/")) ? (
-          playerContainer
+          <PlayerContainer />
         ) : null}
       <AddNewTrack show={this.state.showNewTrackForm} />
     </>

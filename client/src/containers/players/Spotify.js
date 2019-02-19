@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import SpotifyWebApi from 'spotify-web-api-js';
 import Script from 'react-load-script';
-import Provider from  '../providerConfig';
-import SpotifyApi from '../api/spotify';
-import { connect } from 'react-redux';
-import Player from '../components/PlayerUI';
+
+import Provider from  '../../providerConfig';
+import SpotifyApi from '../../api/spotify';
+import Player from '../../components/PlayerUI';
 
 let spotify = new SpotifyWebApi();
 
@@ -58,10 +59,10 @@ class Spotify extends Component {
     console.log("going to load script");
     return (
       <Script
-      url= {Provider.spotify.sdkUrl}
-      onCreate={this.handleScriptCreate.bind(this)}
-      onError={this.handleScriptError.bind(this)}
-      onLoad={this.handleScriptLoad.bind(this)}
+        url= {Provider.spotify.sdkUrl}
+        onCreate={this.handleScriptCreate.bind(this)}
+        onError={this.handleScriptError.bind(this)}
+        onLoad={this.handleScriptLoad.bind(this)}
       />
     );
   }
@@ -145,8 +146,8 @@ class Spotify extends Component {
   }
 
   volume(volume) {
-    player.setVolume(volume).then(() => {
-      console.log('Volume updated!');
+    player.setVolume(Number(volume) / 100.).then(() => {
+      console.log('Volume updated to ' + volume);
     });
   }
 
