@@ -152,6 +152,10 @@ class PlayerUI extends Component {
     });
   }
 
+  strPadLeft = (string,pad, length) => {
+    return (new Array(length+1).join(pad)+string).slice(-length);
+  }
+
   render() {
     const {
       classes,
@@ -165,6 +169,10 @@ class PlayerUI extends Component {
     const duration = currentTrack.duration.split(":");
     const totalSeconds = (+duration[0]) * 60 + (+duration[1]);
     const sliderPercent = sliderAmount/totalSeconds * 100.;
+
+    const currentMinutes = Math.floor(sliderAmount / 60);
+    const currentSeconds = sliderAmount % 60;
+    const currentTime = this.strPadLeft(currentMinutes,'0', 2) + ':' + this.strPadLeft(currentSeconds,'0', 2);
 
     const volumePercent = volumeAmount;
 
@@ -251,12 +259,12 @@ class PlayerUI extends Component {
                   </Grid>
 
                   <Grid item>
-                    <Typography variant="body2" component="p" className={classes.timer}>0:00 </Typography>
+                    <Typography variant="body2" component="p" className={classes.timer}>{currentTime} </Typography>
                   </Grid>
                   <Grid item className={classes.sliderItem}>
                     <input
                       type="range"
-                      step={0.01}
+                      step={1}
                       max={totalSeconds}
                       value={sliderAmount}
                       onChange={this.handleSliderChange}
