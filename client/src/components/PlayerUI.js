@@ -28,7 +28,7 @@ const styles = theme => ({
   },
   playerTopControlsLeftContainer : {
     padding: '0',
-    width: '80%',
+    width: '90%',
     marginTop: '-5px',
   },
   playerTopControlsRightContainer : {
