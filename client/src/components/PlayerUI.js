@@ -28,12 +28,12 @@ const styles = theme => ({
   },
   playerTopControlsLeftContainer : {
     padding: '0',
-    width: '60%',
+    width: '80%',
     marginTop: '-5px',
   },
   playerTopControlsRightContainer : {
     padding: '0',
-    width: '30%',
+    width: '10%',
     marginTop: '-5px',
   },
   playerBottomControlsContainer : {
@@ -45,7 +45,7 @@ const styles = theme => ({
   },
   ControlsMainContainer: {
     height: '60px',
-    flex: 3
+    flex: 7
   },
   playerAlbumInfoContainer: {
     height: '60px',
@@ -84,6 +84,7 @@ const styles = theme => ({
   },
   playerTitle: {
     fontWeight: 'bold',
+    fontSize: '12px',
     width: '100%',
     textAlign: 'center',
   },
@@ -91,6 +92,9 @@ const styles = theme => ({
     fontFamily: 'icomoon',
     fontSize: '12px',
     color: 'black',
+  },
+  sliderItem: {
+    width: '60%',
   },
 });
 
@@ -169,7 +173,7 @@ class PlayerUI extends Component {
         backgroundImage: `
           -webkit-gradient(linear, left top, right top, color-stop(${sliderPercent}%, #4F4F4F), color-stop(${sliderPercent}%, #FFFFFF));
           -moz-linear-gradient(left center, #4F4F4F 0%, #4F4F4F ${sliderPercent}%, #FFFFFF ${sliderPercent}%, #FFFFFF 100%)`,
-        width: '500px',
+        width: '100%',
       },
       volumeStyles: {
         backgroundImage: `
@@ -218,7 +222,7 @@ class PlayerUI extends Component {
               >
                 <Grid container
                   className={classes.playerTopControlsLeftContainer}
-                  justify='flex-end'
+                  justify='center'
                   alignItems='center'
                   direction='row'
                 >
@@ -246,11 +250,10 @@ class PlayerUI extends Component {
                     </IconButton>
                   </Grid>
 
-
                   <Grid item>
                     <Typography variant="body2" component="p" className={classes.timer}>0:00 </Typography>
                   </Grid>
-                  <Grid item>
+                  <Grid item className={classes.sliderItem}>
                     <input
                       type="range"
                       step={0.01}
@@ -263,13 +266,6 @@ class PlayerUI extends Component {
                   <Grid item>
                     <Typography variant="body2" component="p" className={classes.timer}> {currentTrack.duration}</Typography>
                   </Grid>
-                </Grid>
-                <Grid container
-                  className={classes.playerTopControlsRightContainer}
-                  justify='flex-start'
-                  alignItems='center'
-                  direction='row'
-                 >
                   <Grid item>
                     <IconButton aria-label="Loop" >
                       <div className={classNames(classes.playerIcon, 'icon-mm-icon-loop')} />
@@ -308,7 +304,14 @@ class PlayerUI extends Component {
                       className={css(rangeStyles.volumeStyles)}
                     />
                   </Grid>
-                  <Grid item className={classes.volume}>
+                </Grid>
+                <Grid container
+                  className={classes.playerTopControlsRightContainer}
+                  justify='flex-end'
+                  alignItems='center'
+                  direction='row'
+                 >
+                  <Grid>
                     <IconButton aria-label="More">
                       <div className={classNames(classes.playerIcon, 'icon-mm-icon-hamburger')} />
                     </IconButton>

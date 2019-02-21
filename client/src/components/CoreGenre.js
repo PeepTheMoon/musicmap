@@ -170,8 +170,7 @@ const styles = theme => ({
 });
 
 const TRACK_OPTIONS = [
-  'Add to Favorites',
-  'Flag',
+  // Add options for hamburger menu here
 ];
 
 class CoreGenre extends Component {
