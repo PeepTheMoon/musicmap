@@ -9,6 +9,15 @@ export const updateCurrentTrack = (currentTrack) => dispatch => {
   });
 };
 
+export const updateCurrentDevice = (deviceId) => dispatch => {
+  return dispatch({
+    type: PLAYER.UPDATE_CURRENT_DEVICE_ID,
+    payload: {
+      deviceId,
+    },
+  });
+}
+
 export const storeAllTracks = (tracks) => dispatch => {
   return dispatch({
     type: PLAYER.STORE_ALL_TRACKS,
@@ -18,11 +27,19 @@ export const storeAllTracks = (tracks) => dispatch => {
   })
 }
 
-export const updateCurrentPlayer = (playerType) => dispatch => {
+export const updatePlayerState = (playerState) => dispatch => {
+  return dispatch({
+    type: PLAYER.UPDATE_PLAYER_STATE,
+    payload: playerState,
+  })
+}
+
+export const updateCurrentPlayer = (playerType, player) => dispatch => {
   return dispatch({
     type: PLAYER.CHANGE_PLAYER_TYPE,
     payload: {
       playerType,
+      player,
     },
   });
 };

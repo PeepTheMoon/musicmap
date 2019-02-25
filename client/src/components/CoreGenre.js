@@ -25,8 +25,10 @@ import green from '@material-ui/core/colors/green';
 import LongMenu from './LongMenu';
 import {
   updateCurrentTrack as updateCurrentTrackAction,
+  updatePlayerState as updatePlayerStateAction,
   storeAllTracks as storeAllTracksAction,
 } from '../actions/playerAction';
+import SpotifyApi from '../api/spotify';
 
 const token = 'BQCEgGDO5KKUuD6BvfR1vQdASUPFHOx0AIFHjrra0Jr5PnY1mZ2gBsdWFPFi49iXsgYcPxQSeUODTyMTEQhDmHa9-xKl5sneO2thYO-Ich0RWWucIboeE8Jp2e-2pFpFT9MQPKZmKjKdzpiCNnkWWbUG3P5w43-6LKZVf6pqvyT3qB2k1TUtfeEX';
 const buttonGradientBackground = 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)';
@@ -234,7 +236,7 @@ class CoreGenre extends Component {
    * @param {track object} track
    */
   playTrack = (track) => {
-    const { playerType } = this.props;
+    const { playerType, updateCurrentTrack } = this.props;
 
     switch (playerType) {
       case 'spotify':
@@ -243,10 +245,12 @@ class CoreGenre extends Component {
       default:
         this.playItOnSpotify(track);
     };
+
+    updateCurrentTrack(track);
   }
 
   playItOnSpotify = (track) => {
-    const { updateCurrentTrack } = this.props;
+    const { player, deviceId, updatePlayerState } = this.props;
 
     let accessToken = localStorage.getItem('mm_spotify_access_token');
     if (accessToken) {
@@ -254,9 +258,17 @@ class CoreGenre extends Component {
         currentTrack: track,
         showPlayer: true,
       });
-      updateCurrentTrack(track);
-    }
-    else {
+
+      if (player) {
+        // OPTIONAL: Allow for play right after clicking new track
+        // const spotifyApi = new SpotifyApi();
+
+        // spotifyApi.fetchTrack(deviceId, track.trackId);
+        // updatePlayerState({
+        //   isPlaying: true,
+        // });
+      }
+    } else {
       console.log("going to get new token from spotify")
       this.getSpotifyAccessToken();
     }
@@ -448,7 +460,7 @@ class CoreGenre extends Component {
         </Paper>
       </div>
       {(this.state.showPlayer || window.location.href.includes("callback/")) ? (
-          <PlayerContainer />
+          <PlayerContainer playerType="spotify" />
         ) : null}
       <AddNewTrack show={this.state.showNewTrackForm} />
     </>
@@ -460,19 +472,25 @@ class CoreGenre extends Component {
 const mapStateToProps = (state) => ({
   playerType: state.player.playerType,
   tracks: state.player.tracks,
+  player: state.player.player,
+  deviceId: state.player.deviceId,
 });
 
 const mapDispatchToProps = {
   updateCurrentTrack: updateCurrentTrackAction,
   storeAllTracks: storeAllTracksAction,
+  updatePlayerState: updatePlayerStateAction,
 };
 
 CoreGenre.propTypes = {
   classes: PropTypes.object.isRequired,
   tracks: PropTypes.arrayOf(PropTypes.object),
   updateCurrentTrack: PropTypes.func,
+  updatePlayerState: PropTypes.func,
   storeAllTracks: PropTypes.func,
   playerType: PropTypes.string,
+  player: PropTypes.object,
+  deviceId: PropTypes.string,
 };
 
 

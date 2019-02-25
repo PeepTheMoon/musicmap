@@ -3,10 +3,10 @@ import { StyleSheet, css } from 'aphrodite';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
-import {Paper, Grid, IconButton, SvgIcon, Avatar, Typography} from '@material-ui/core';
+import { Paper, Grid, IconButton, SvgIcon, Avatar } from '@material-ui/core';
 import { rotatein } from 'react-animations';
 import classNames from 'classnames';
-import { updateCurrentTrack } from '../actions/playerAction';
+import { updateCurrentTrack, updatePlayerState } from '../actions/playerAction';
 
 
 const buttonGradientBackground = 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)';
@@ -93,6 +93,11 @@ const styles = theme => ({
     fontSize: '12px',
     color: 'black',
   },
+  playerIconActive: {
+    fontFamily: 'icomoon',
+    fontSize: '12px',
+    color: 'green',
+  },
   sliderItem: {
     width: '60%',
   },
@@ -103,29 +108,84 @@ class PlayerUI extends Component {
     super(props);
     this.state = {
       isPlaying: false,
-      isMuted: false,
-      volumeAmount: 25,
-      sliderAmount: 0,
-      props: this.props
+      volumeAmount: 50,
+      timerId: 0,
     }
   }
 
-  _handlePlay() {
+  _handlePlay = (track) => {
     const {
       play,
-      currentTrack,
     } = this.props;
 
-    play(currentTrack.trackId);
+    play(track.trackId);
+
+    const timerId = setInterval(() => {
+      const { sliderAmount, player } = this.props;
+      const { isPlaying } = this.state;
+
+      player.getCurrentState().then((state) => {
+        if (state) {
+          // state.position in ms
+          this.formatCurrentTime(Math.round(state.position / 1000));
+
+          if (isPlaying && state.position === 0 && state.paused) {
+            this._handleNext();
+          } else if (isPlaying && state.paused) {
+            this._handlePause();
+          }
+        }
+      });
+    }, 1000);
+
     this.setState({
-      isPlaying: true
+      timerId,
+      isPlaying: true,
     })
   }
 
-  _handlePause() {
-    this.props.pause();
+  _handleNext = () => {
+    const { next } = this.props;
+    const { isPlaying } = this.state;
+
+    const nextTrack = next();
+    this.formatCurrentTime(0);
+
+    if (isPlaying) {
+      this._handlePause();
+      this._handlePlay(nextTrack);
+    }
+  }
+
+  _handlePrev = () => {
+    const { prev } = this.props;
+    const { isPlaying } = this.state;
+
+    const prevTrack = prev();
+    this.formatCurrentTime(0);
+
+    if (isPlaying) {
+      this._handlePause();
+      this._handlePlay(prevTrack);
+    }
+  }
+
+  _handleShuffle = () => {
+    const { toggleShuffle } = this.props;
+    toggleShuffle();
+  }
+
+  _handlePause = () => {
+    const {
+      pause,
+    } = this.props;
+
+    pause();
+
+    clearInterval(this.state.timerId);
+
     this.setState({
-      isPlaying: false
+      isPlaying: false,
     })
   }
 
@@ -141,14 +201,31 @@ class PlayerUI extends Component {
     });
   }
 
-  handleSliderChange = (e) => {
+  handleSliderChange = (position) => {
     const {
       seek,
     } = this.props;
+    const sliderAmount = Number(position);
 
-    seek(e.target.value);
-    this.setState({
-      sliderAmount: e.target.value,
+    seek(sliderAmount);
+
+    this.formatCurrentTime(sliderAmount);
+  }
+
+  _handleMuteUnmute = () => {
+    const { muteUnmute } = this.props;
+    muteUnmute();
+  }
+
+  formatCurrentTime = (sliderAmount) => {
+    const { updatePlayerState } = this.props;
+    const currentMinutes = Math.floor(sliderAmount / 60);
+    const currentSeconds = sliderAmount % 60;
+    const currentTime = this.strPadLeft(currentMinutes,'0', 2) + ':' + this.strPadLeft(currentSeconds,'0', 2);
+
+    updatePlayerState({
+      currentTime,
+      sliderAmount,
     });
   }
 
@@ -160,19 +237,25 @@ class PlayerUI extends Component {
     const {
       classes,
       currentTrack,
+      currentTime,
+      sliderAmount,
+      isMuted,
+      isShuffle,
     } = this.props;
+
     const {
       volumeAmount,
-      sliderAmount,
+      isPlaying,
+      timerId,
     } = this.state;
+
+    if (!currentTrack.trackId) {
+      return null;
+    }
 
     const duration = currentTrack.duration.split(":");
     const totalSeconds = (+duration[0]) * 60 + (+duration[1]);
     const sliderPercent = sliderAmount/totalSeconds * 100.;
-
-    const currentMinutes = Math.floor(sliderAmount / 60);
-    const currentSeconds = sliderAmount % 60;
-    const currentTime = this.strPadLeft(currentMinutes,'0', 2) + ':' + this.strPadLeft(currentSeconds,'0', 2);
 
     const volumePercent = volumeAmount;
 
@@ -236,30 +319,30 @@ class PlayerUI extends Component {
                 >
                   <Grid item>
                     <IconButton aria-label="Previous" >
-                      <div className={classNames(classes.playerIcon, 'icon-mm-icon-previous')} />
+                      <div onClick={this._handlePrev} className={classNames(classes.playerIcon, 'icon-mm-icon-previous')} />
                     </IconButton>
                   </Grid>
                   <Grid item>
-                    {this.state.isPlaying ?
+                    {isPlaying ?
                         (
                           <IconButton aria-label="Pause">
-                            <div onClick={this._handlePause.bind(this)} className={classNames(classes.playerIcon, 'icon-mm-icon-pause')} />
+                            <div onClick={this._handlePause} className={classNames(classes.playerIcon, 'icon-mm-icon-pause')} />
                           </IconButton>
                         ) : (
                           <IconButton aria-label="Play">
-                            <div onClick={this._handlePlay.bind(this)} className={classNames(classes.playerIcon, 'icon-mm-icon-play')} />
+                            <div onClick={() => this._handlePlay(currentTrack)} className={classNames(classes.playerIcon, 'icon-mm-icon-play')} />
                           </IconButton>
                         )
                     }
                   </Grid>
                   <Grid item>
                     <IconButton aria-label="Next" >
-                      <div onClick={this.props.updateCurrentTrack} className={classNames(classes.playerIcon, 'icon-mm-icon-next')} />
+                      <div onClick={this._handleNext} className={classNames(classes.playerIcon, 'icon-mm-icon-next')} />
                     </IconButton>
                   </Grid>
 
                   <Grid item>
-                    <Typography variant="body2" component="p" className={classes.timer}>{currentTime} </Typography>
+                    <p className={classes.timer}>{currentTime} </p>
                   </Grid>
                   <Grid item className={classes.sliderItem}>
                     <input
@@ -267,12 +350,12 @@ class PlayerUI extends Component {
                       step={1}
                       max={totalSeconds}
                       value={sliderAmount}
-                      onChange={this.handleSliderChange}
+                      onChange={(e) => this.handleSliderChange(e.target.value)}
                       className={css(rangeStyles.sliderStyles)}
                     />
                   </Grid>
                   <Grid item>
-                    <Typography variant="body2" component="p" className={classes.timer}> {currentTrack.duration}</Typography>
+                    <p className={classes.timer}> {currentTrack.duration}</p>
                   </Grid>
                   <Grid item>
                     <IconButton aria-label="Loop" >
@@ -281,12 +364,15 @@ class PlayerUI extends Component {
                   </Grid>
                   <Grid item>
                     <IconButton aria-label="Shuffle" >
-                      <div className={classNames(classes.playerIcon, 'icon-mm-icon-shuffle')} />
+                      <div
+                        onClick={this._handleShuffle}
+                        className={classNames(isShuffle ? classes.playerIconActive : classes.playerIcon, 'icon-mm-icon-shuffle')}
+                      />
                     </IconButton>
                   </Grid>
 
                   <Grid item className={classes.volume}>
-                    {!this.state.isMuted ?
+                    {!isMuted ?
                       (
                         <IconButton aria-label="Mute" >
                           <div onClick={this._handleMuteUnmute} className={classNames(classes.playerIcon, 'icon-mm-icon-volume')} />
@@ -336,6 +422,9 @@ class PlayerUI extends Component {
 
 const mapStateToProps = state => ({
   currentTrack: state.player.currentTrack,
+  currentTime: state.player.currentTime,
+  sliderAmount: state.player.sliderAmount,
+  player: state.player.player,
 })
 
 PlayerUI.propTypes = {
@@ -343,10 +432,16 @@ PlayerUI.propTypes = {
   currentTrack: PropTypes.object.isRequired,
   playerType: PropTypes.string,
   play: PropTypes.func,
+  player: PropTypes.object,
   pause: PropTypes.func,
   volume: PropTypes.func,
+  next: PropTypes.func,
+  prev: PropTypes.func,
+  toggleShuffle: PropTypes.func,
+  muteUnmute: PropTypes.func,
   isPlaying: PropTypes.bool,
   isMuted: PropTypes.bool,
+  isShuffle: PropTypes.bool,
 };
 
-export default withStyles(styles)(connect(mapStateToProps, { updateCurrentTrack })(PlayerUI));
+export default withStyles(styles)(connect(mapStateToProps, { updateCurrentTrack, updatePlayerState })(PlayerUI));

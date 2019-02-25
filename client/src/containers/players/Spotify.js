@@ -9,6 +9,12 @@ import Script from 'react-load-script';
 import Provider from  '../../providerConfig';
 import SpotifyApi from '../../api/spotify';
 import Player from '../../components/PlayerUI';
+import {
+  updateCurrentDevice as updateCurrentDeviceAction,
+  updateCurrentPlayer as updateCurrentPlayerAction,
+  updatePlayerState as updatePlayerStateAction,
+  updateCurrentTrack as updateCurrentTrackAction,
+} from '../../actions/playerAction';
 
 let spotify = new SpotifyWebApi();
 
@@ -31,9 +37,9 @@ class Spotify extends Component {
       playerConnected: false,
       spotifyPlayerId: null,
       playerReady: false,
-      deviceId: '',
       isPlaying: false,
       isMuted: false,
+      isShuffle: false,
       currentTrack: undefined,
     }
   }
@@ -68,12 +74,14 @@ class Spotify extends Component {
   }
 
   connectPlayerToSpotify() {
+    const { updateCurrentPlayer } = this.props;
+
     let token  = spotifyApi.getToken();
     console.log("token : " +  token)
 
     window.onSpotifyWebPlaybackSDKReady = () => {
       let Spotify = window.Spotify;
-       player = new Spotify.Player({
+      player = new Spotify.Player({
         name: 'Ocean Protocol\'s Music Map',
         getOAuthToken: cb => { cb(token); }
       });
@@ -85,23 +93,27 @@ class Spotify extends Component {
       player.addListener('playback_error', ({ message }) => { console.error(message); });
 
       // Playback status updates
-      player.addListener('player_state_changed', state => { console.log(state); });
+      player.addListener('player_state_changed', state => { console.log("State change: " + state); });
 
       // Ready
-      player.addListener('ready', ({ device_id }) => {
-        console.log('Ready with Device ID', device_id);
+      player.addListener('ready', ({ device_id: deviceId }) => {
+        console.log('Ready with Device ID', deviceId);
+
+        const { updateCurrentDevice, currentTrack } = this.props;
+        updateCurrentDevice(deviceId);
+
         this.setState({
           playerReady: true,
-          deviceId: device_id,
-        })
+        });
+        // this.play(currentTrack.trackId);
       });
 
       // Not Ready
-      player.addListener('not_ready', ({ device_id }) => {
-        console.log('Device ID has gone offline', device_id);
+      player.addListener('not_ready', ({ deviceId }) => {
+        console.log('Device ID has gone offline', deviceId);
         this.setState({
           playerReady: false
-        })
+        });
       });
 
       // Connect to the player!
@@ -112,18 +124,24 @@ class Spotify extends Component {
             this.setState({
               playerConnected: true,
               spotifyPlayerId: player['_options'].id
-            })
+            });
           }
         });
+
+      updateCurrentPlayer('spotify', player);
     };
   }
 
   play = (trackId) => {
     const {
       deviceId,
-    } = this.state;
+      volume,
+    } = this.props;
 
     console.log(`Playing on device: ${deviceId}`);
+    player.setVolume(volume / 100.).then(() => {
+      console.log('Volume updated to ' + volume);
+    });
     spotifyApi.fetchTrack(deviceId, trackId);
   }
 
@@ -145,12 +163,91 @@ class Spotify extends Component {
     });
   }
 
-  volume(volume) {
-    player.setVolume(Number(volume) / 100.).then(() => {
+  volume = (volume) => {
+    const { updatePlayerState } = this.props;
+    updatePlayerState({
+      volume,
+    });
+    player.setVolume(volume / 100.).then(() => {
       console.log('Volume updated to ' + volume);
     });
   }
 
+  next = () => {
+    const { tracks, currentTrack, updateCurrentTrack } = this.props;
+    const { isShuffle } = this.state;
+
+    const currentTrackIndex = tracks.findIndex((track) => (
+      track.trackId === currentTrack.trackId
+    ));
+
+    const nextTrackIndex = isShuffle ?
+      this.selectRandomIndex(currentTrackIndex) :
+      (currentTrackIndex + 1) % tracks.length;
+
+    updateCurrentTrack(tracks[nextTrackIndex]);
+
+    return tracks[nextTrackIndex];
+  }
+
+  prev = () => {
+    const { tracks, currentTrack, updateCurrentTrack } = this.props;
+    const { isShuffle } = this.state;
+
+    const currentTrackIndex = tracks.findIndex((track) => (
+      track.trackId === currentTrack.trackId
+    ));
+
+    const prevTrackIndex = isShuffle ?
+      this.selectRandomIndex(currentTrackIndex) : currentTrackIndex === 0 ?
+      tracks.length - 1 : (currentTrackIndex - 1);
+
+    updateCurrentTrack(tracks[prevTrackIndex]);
+
+    return tracks[prevTrackIndex];
+  }
+
+  selectRandomIndex = (currentTrackIndex) => {
+    const { tracks } = this.props;
+
+    let nextIndex;
+    if (tracks.length > 2) {
+      let randomIndex = Math.round(Math.random()*tracks.length - 1);
+
+      while (randomIndex === currentTrackIndex) {
+        randomIndex = Math.round(Math.random() * (tracks.length - 1));
+      }
+
+      nextIndex = randomIndex;
+    } else {
+      nextIndex = (currentTrackIndex + 1) % tracks.length;
+    }
+    return nextIndex;
+  }
+
+  toggleShuffle = () => {
+    const { isShuffle } = this.state;
+    this.setState({
+      isShuffle: !isShuffle,
+    });
+  }
+
+  muteUnmute = () => {
+    const { isMuted } = this.state;
+    const { volume } = this.props;
+    if (isMuted) {
+      player.setVolume(volume / 100.).then(() => {
+        console.log('Mute turned off and volume reset to: ' + volume);
+      })
+    } else {
+      player.setVolume(0).then(() => {
+        console.log('Player was muted');
+      });
+    }
+    this.setState({
+      isMuted: !isMuted,
+    });
+  }
 
   componentWillMount() {
     console.log("Will mount")
@@ -184,21 +281,27 @@ class Spotify extends Component {
   }
 
   render() {
-    const { classes } = this.props;
-    let test = this.state.playerConnected ? player.getCurrentState().then((res) => console.log(res)) : null
+    const {
+      classes,
+    } = this.props;
+
     return (
       <div className={classes.root}>
         {this.state.playerConnected ?  this.loadPlayerScript(): null}
         {this.state.scriptLoaded ? null : <LinearProgress />}
         <Player
           playerType='spotify'
-          currentTrack={this.state.currentTrack}
           play={this.play}
           pause={this.pause}
           seek={this.seek}
+          next={this.next}
+          prev={this.prev}
           volume={this.volume}
+          toggleShuffle={this.toggleShuffle}
+          muteUnmute={this.muteUnmute}
           isPlaying={this.state.isPlaying}
           isMuted={this.state.isMuted}
+          isShuffle={this.state.isShuffle}
         />
       </div>
     );
@@ -206,13 +309,34 @@ class Spotify extends Component {
 }
 
 const mapStateToProps = state => ({
-  currentTrack: state.player.currentTrack
-})
+  currentTrack: state.player.currentTrack,
+  tracks: state.player.tracks,
+  playerType: state.player.playerType,
+  player: state.player.player,
+  deviceId: state.player.deviceId,
+  volume: state.player.volume,
+});
+
+const mapDispatchToProps = {
+  updateCurrentDevice: updateCurrentDeviceAction,
+  updateCurrentPlayer: updateCurrentPlayerAction,
+  updatePlayerState: updatePlayerStateAction,
+  updateCurrentTrack: updateCurrentTrackAction,
+};
 
 Spotify.propTypes = {
   classes: PropTypes.object.isRequired,
+  currentTrack: PropTypes.object,
+  tracks: PropTypes.arrayOf(PropTypes.object),
+  updateCurrentDevice: PropTypes.func,
+  updateCurrentPlayer: PropTypes.func,
+  updatePlayerState: PropTypes.func,
+  playerType: PropTypes.string,
+  player: PropTypes.object,
+  deviceId: PropTypes.string,
+  volume: PropTypes.number,
 };
 
-export default withStyles(styles)(Spotify);
+export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(Spotify));
 
 
