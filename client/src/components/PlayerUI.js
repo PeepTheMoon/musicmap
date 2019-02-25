@@ -72,7 +72,10 @@ const styles = theme => ({
     fontSize: theme.spacing.unit * 1.8
   },
   volumeItem: {
-    flex: 1
+    width: '15%',
+    [theme.breakpoints.down('lg')]: {
+      width: '10%',
+    },
   },
   albumThumbnail: {
     width: 80,
@@ -100,6 +103,12 @@ const styles = theme => ({
   },
   sliderItem: {
     width: '60%',
+    [theme.breakpoints.down('md')]: {
+      width: '30%',
+    },
+    [theme.breakpoints.down('sm')]: {
+      width: '10%',
+    },
   },
 });
 
@@ -267,6 +276,7 @@ class PlayerUI extends Component {
         width: '100%',
       },
       volumeStyles: {
+        width: '100%',
         backgroundImage: `
           -webkit-gradient(linear, left top, right top, color-stop(${volumePercent}%, #4F4F4F), color-stop(${volumePercent}%, #FFFFFF));
           -moz-linear-gradient(left center, #4F4F4F 0%, #4F4F4F ${volumePercent}%, #FFFFFF ${volumePercent}%, #FFFFFF 100%)`,
@@ -386,7 +396,7 @@ class PlayerUI extends Component {
                   </Grid>
                   <Grid
                     item
-                    className={classes.volume}
+                    className={classes.volumeItem}
                   >
                     <input
                       type="range"

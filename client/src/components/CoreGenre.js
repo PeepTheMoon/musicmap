@@ -69,7 +69,7 @@ const styles = theme => ({
     margin: 'auto',
   },
   playButton: {
-    width: '25%',
+    width: '200px',
     background: 'linear-gradient(#A9A9A9, #C9C9C9, #A9A9A9)',
     color: '#FFF',
     padding: 0,
