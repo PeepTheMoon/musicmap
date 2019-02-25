@@ -169,6 +169,9 @@ const styles = theme => ({
     display: 'inline-block',
     width: '5%',
   },
+  trackCell: {
+    padding: '0',
+  },
 });
 
 const TRACK_OPTIONS = [
@@ -374,12 +377,12 @@ class CoreGenre extends Component {
             return (
             <TableRow className={classes.itemRow} key={track.trackId}>
               <TableCell className={classes.emptyCell}>&nbsp;</TableCell>
-              <TableCell> <Icon onClick={() => this.playTrack(track)} className={classNames(classes.icon, 'fa fa-play-circle fa-2x')} /></TableCell>
-              <TableCell>{track.title}</TableCell>
-              <TableCell>{track.artists}</TableCell>
-              <TableCell>{track.album}</TableCell>
-              <TableCell>{track.year}</TableCell>
-              <TableCell style={{ width: '5%' }}>
+              <TableCell className={classes.trackCell}> <Icon onClick={() => this.playTrack(track)} className={classNames(classes.icon, 'fa fa-play-circle fa-2x')} /></TableCell>
+              <TableCell className={classes.trackCell}>{track.title}</TableCell>
+              <TableCell className={classes.trackCell}>{track.artists}</TableCell>
+              <TableCell className={classes.trackCell}>{track.album}</TableCell>
+              <TableCell className={classes.trackCell}>{track.year}</TableCell>
+              <TableCell className={classes.trackCell} style={{ width: '5%' }}>
                 <div className={classes.durationTime}>
                   {track.duration}
                 </div>
