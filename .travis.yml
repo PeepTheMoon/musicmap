@@ -22,3 +22,6 @@ cache:
   directories:
     - client/node_modules
     - server/node_modules
+
+env:
+  MONGODB_URL = mongodb://localhost:27017/musicmap
