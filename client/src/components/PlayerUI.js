@@ -125,7 +125,19 @@ class PlayerUI extends Component {
     this.state = {
       isPlaying: false,
       timerId: 0,
-    }
+    };
+  }
+
+  componentWillMount() {
+    window.addEventListener('newTrackSelected', (e) => {
+      this.formatCurrentTime(0);
+      this._handlePause();
+      this._handlePlay(e.detail);
+    });
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('newTrackSelected');
   }
 
   _handlePlay = (track) => {

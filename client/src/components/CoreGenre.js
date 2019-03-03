@@ -246,6 +246,9 @@ class CoreGenre extends Component {
   playTrack = (track) => {
     const { playerType, updateCurrentTrack } = this.props;
 
+    const event = new CustomEvent('newTrackSelected', { detail: track });
+    window.dispatchEvent(event);
+
     switch (playerType) {
       case 'spotify':
         this.playItOnSpotify(track);
