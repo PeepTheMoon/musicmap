@@ -3,21 +3,15 @@ import { Provider } from 'react-redux';
 import store from './store';
 import {
   BrowserRouter as Router,
-  Link,
   Route,
-  Redirect,
   Switch
 } from 'react-router-dom'
 import ProtectedRoute from './components/ProtectedRoute';
 import NotFound from './components/NotFound';
-import MusicPlayer from './components/MusicPlayer';
 import CoreGenre from './components/CoreGenre';
 import Logout from './components/Logout';
 import Auth from './components/Auth';
 import Profile from './components/Profile';
-import { loadCSS } from 'fg-loadcss/src/loadCSS';
-
-
 
 class App extends Component {
   constructor(props){

@@ -22,13 +22,15 @@ class PlayerContainer extends Component {
   }
 
   render(){
+    let player;
     switch(this.props.playerType) {
       case 'spotify':
-        return <Spotify />;
+        player = <Spotify />;
         break;
       default:
-        return <Spotify />;
+        player = <Spotify />;
     };
+    return player;
   }
 }
 

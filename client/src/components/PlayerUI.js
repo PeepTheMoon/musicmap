@@ -3,13 +3,10 @@ import { StyleSheet, css } from 'aphrodite';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
-import { Paper, Grid, IconButton, SvgIcon, Avatar } from '@material-ui/core';
+import { Paper, Grid, IconButton } from '@material-ui/core';
 import { rotatein } from 'react-animations';
 import classNames from 'classnames';
 import { updateCurrentTrack, updatePlayerState } from '../actions/playerAction';
-
-
-const buttonGradientBackground = 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)';
 
 const styles = theme => ({
   '@keyframes rotatein': rotatein,
@@ -143,13 +140,12 @@ class PlayerUI extends Component {
   _handlePlay = (track) => {
     const {
       play,
-      isRepeat,
     } = this.props;
 
     play(track.trackId);
 
     const timerId = setInterval(() => {
-      const { sliderAmount, player, isRepeat } = this.props;
+      const { player, isRepeat } = this.props;
       const { isPlaying } = this.state;
 
       player.getCurrentState().then((state) => {
@@ -248,7 +244,7 @@ class PlayerUI extends Component {
   }
 
   _handleMuteUnmute = () => {
-    const { muteUnmute, isMuted } = this.props;
+    const { muteUnmute } = this.props;
     muteUnmute();
   }
 
@@ -282,7 +278,6 @@ class PlayerUI extends Component {
 
     const {
       isPlaying,
-      timerId,
     } = this.state;
 
     if (!currentTrack.trackId) {

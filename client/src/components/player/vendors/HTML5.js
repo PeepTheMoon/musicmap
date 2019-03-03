@@ -1,4 +1,4 @@
-import React, { Component, createElement } from 'react'
+import { Component, createElement } from 'react'
 import PropTypes from 'prop-types'
 import { findDOMNode } from 'react-dom'
 import vendorPropTypes from './vendor-prop-types'

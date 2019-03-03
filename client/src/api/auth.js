@@ -56,7 +56,7 @@ export default class Auth {
             })
         });
         const data = await resp.json();
-        if (resp.status != 200) {
+        if (resp.status !== 200) {
             return data.message;
         }
     }
@@ -76,7 +76,7 @@ export default class Auth {
             })
         });
         const data = await resp.json();
-        if (resp.status != 200) {
+        if (resp.status !== 200) {
             return data.message;
         }
     }

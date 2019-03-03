@@ -1,5 +1,4 @@
 import { PLAYER } from '../actions/types';
-import merge from 'deepmerge';
 
 const initialState = {
   currentTrack: {},

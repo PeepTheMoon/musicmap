@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import PropTypes from 'prop-types'
 import withMediaProps from '../decorators/with-media-props'
 import formatTime from '../utils/format-time'
 

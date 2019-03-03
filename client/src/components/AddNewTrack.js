@@ -1,24 +1,23 @@
 import React, { Component } from 'react';
 import { withStyles } from '@material-ui/core/styles';
-import { Modal, Typography, TextField, 
-    Button, Grid, Divider, SvgIcon, IconButton,
+import { Modal, Typography, TextField,
+    Button, Grid, SvgIcon, IconButton,
     Table, TableBody, TableCell, TableRow, Paper,
     TableHead, Checkbox } from '@material-ui/core';
-import { throws } from 'assert';
 
 const user = "whitedragon1234";
 const styles = theme => ({
     paper: {
       margin: '0 auto',
       marginTop: theme.spacing.unit * 10,
-      width: theme.spacing.unit * 100, 
+      width: theme.spacing.unit * 100,
       backgroundColor: theme.palette.background.paper,
       boxShadow: theme.shadows[5],
       padding: theme.spacing.unit * 4,
       overflowX: 'auto'
     },
     modal: {
-        margin: '0 auto', 
+        margin: '0 auto',
     },
     titleContainer:{
       margin: `${theme.spacing.unit * 2}px 0 ${theme.spacing.unit * 2}px 0`,
@@ -65,22 +64,6 @@ const styles = theme => ({
     }
 });
 
-
-const TrackField = (props) => {
-    return (
-            <TextField
-                id="album"
-                label={props.label}
-                defaultValue={props.children}
-                className={props.className}
-                margin="normal"
-                InputProps={{
-                    readOnly: true,
-                }}
-            />
-    )
-    
-}
 class AddNewTrack extends Component {
     constructor(props){
         super(props);
@@ -99,7 +82,7 @@ class AddNewTrack extends Component {
         this.setState({ show: false, trackDetails: null });
     };
 
-    
+
     componentWillReceiveProps(nextProps){
         if(nextProps.show !== this.state.show){
             this.setState({
@@ -110,7 +93,7 @@ class AddNewTrack extends Component {
     handleUserTrackInput(e){
         e.preventDefault();
         console.log(this.spotifyTrackUri.current.value)
-        if(this.spotifyTrackUri.current.value == ''){
+        if(this.spotifyTrackUri.current.value === ''){
             console.log("Track Id is required field")
             this.setState({isValidationError: true})
             return false;
@@ -121,15 +104,15 @@ class AddNewTrack extends Component {
     calculateTrackDuration(durationInMs){
         let min = parseInt((durationInMs/1000) / 60);
         let sec = parseInt((durationInMs/1000) % 60);
-       return `${parseInt(min / 10) == 0 ? `0${min}` : min}:${parseInt(sec / 10) == 0 ? `0${sec}` : sec}`; 
+       return `${parseInt(min / 10) === 0 ? `0${min}` : min}:${parseInt(sec / 10) === 0 ? `0${sec}` : sec}`;
     }
 
     calculateYear(releaseDate, releasePrecision = 'year'){
-        if(releasePrecision != 'year'){
+        if(releasePrecision !== 'year'){
             let year = releaseDate.split('-')[0];
             return year;
         }
-        
+
         return releaseDate;
     }
 
@@ -142,10 +125,9 @@ class AddNewTrack extends Component {
     selectTrack(e){
         e.preventDefault();
         const selected = [...this.state.selectedTracks];
-        const tracks = this.state.tracks;
         let index = selected.indexOf(e.currentTarget.id);
         //check if track is already in the list, if yes remove it else add it
-        index != -1 ? selected.splice(index, 1) : selected.push(e.currentTarget.id);
+        index !== -1 ? selected.splice(index, 1) : selected.push(e.currentTarget.id);
         this.setState({
             selectedTracks: selected.slice(0)
         })
@@ -165,12 +147,12 @@ class AddNewTrack extends Component {
                 selectedTracks: selected.slice(0)
             })
         }
-        
+
     }
 
     fetchTrackDetails(e){
         if(this.handleUserTrackInput(e)){
-            
+
             fetch(`http://localhost:4000/spotify/search?q=${this.spotifyTrackUri.current.value}`)
             .then(resp => resp.json())
             .then(data => {
@@ -198,15 +180,18 @@ class AddNewTrack extends Component {
         e.preventDefault();
         const {tracks, selectedTracks} = this.state;
         let tracksToSend = tracks.map(t => {
-            if(selectedTracks.indexOf(t.trackId) !== -1)
+            if(selectedTracks.indexOf(t.trackId) !== -1) {
                 return t;
+            } else {
+                return undefined;
+            }
         })
         tracksToSend = tracksToSend.filter(t => t);
-        
+
         let _body = {};
         _body['tracks'] = tracksToSend.slice(0);
 
-        const trackResp =  fetch('http://localhost:4000/track', {
+        fetch('http://localhost:4000/track', {
             method: 'POST',
             mode: 'cors',
             headers: {
@@ -216,10 +201,7 @@ class AddNewTrack extends Component {
             body: JSON.stringify(_body)
         })
         .then(resp => resp.json())
-        .then(data => console.log(data))
-
-        
-        
+        .then(data => console.log(data));
     }
     renderValidationError(classes){
         if(!this.state.isValidationError){
@@ -240,7 +222,7 @@ class AddNewTrack extends Component {
                     <SvgIcon onClick={this.handleClose.bind(this)} className={classes.icon} color='secondary'>
                         <path opacity=".87" fill="none" d="M0 0h24v24H0V0z"/>
                         <path opacity=".3" d="M12 4c-4.41 0-8 3.59-8 8s3.59 8 8 8 8-3.59 8-8-3.59-8-8-8zm5 11.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/>
-                        <path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.59-13L12 10.59 8.41 7 7 8.41 10.59 12 7 15.59 8.41 17 12 13.41 15.59 17 17 15.59 13.41 12 17 8.41z"/>                   
+                        <path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.59-13L12 10.59 8.41 7 7 8.41 10.59 12 7 15.59 8.41 17 12 13.41 15.59 17 17 15.59 13.41 12 17 8.41z"/>
                     </SvgIcon>
                 </IconButton>
             </div>
@@ -254,7 +236,7 @@ class AddNewTrack extends Component {
                 </Typography>
             </div>
         )
-       
+
     }
     renderGetTrackDetailsForm(classes){
         return (
@@ -279,22 +261,22 @@ class AddNewTrack extends Component {
                         </Grid>
                         <Grid item className={classes.getTrackBtn}>
                             <Button variant="contained"
-                                color="secondary" 
+                                color="secondary"
                                 className={classes.getTrackButton}
                                 type="submit">
                             Get Track Details
                             </Button>
                         </Grid>
-                    </Grid>    
+                    </Grid>
                 </div>
             </form>
-                   
+
         )
     }
 
     renderTracksTable(classes){
 
-        if(this.state.tracks.length == 0){
+        if(this.state.tracks.length === 0){
             return null;
         }
         let tracks = [...this.state.tracks];
@@ -306,10 +288,10 @@ class AddNewTrack extends Component {
                         <TableHead>
                             <TableRow
                             hover
-                            onClick={this.selectAllTracks.bind(this)}  
+                            onClick={this.selectAllTracks.bind(this)}
                             >
                                 <TableCell padding="checkbox">
-                                    <Checkbox checked={this.state.tracks.length == this.state.selectedTracks.length} />
+                                    <Checkbox checked={this.state.tracks.length === this.state.selectedTracks.length} />
                                 </TableCell>
                                 <TableCell>Title</TableCell>
                                 <TableCell>Album</TableCell>
@@ -329,8 +311,8 @@ class AddNewTrack extends Component {
                             onClick={this.selectTrack.bind(this)}
                             >
                                 <TableCell padding="checkbox">
-                                    <Checkbox 
-                                    checked={this.state.selectedTracks.indexOf(track.trackId) != -1 ? true : false} 
+                                    <Checkbox
+                                    checked={this.state.selectedTracks.indexOf(track.trackId) !== -1 ? true : false}
                                     />
                                 </TableCell>
                                 <TableCell component="th" scope="row">
@@ -348,7 +330,7 @@ class AddNewTrack extends Component {
                 </Paper>
                 {this.renderButtons(classes)}
             </div>
-            
+
             )
     }
     renderButtons(classes){
@@ -356,47 +338,14 @@ class AddNewTrack extends Component {
             <div className={classes.btnContainer}>
                 <Button variant="contained" onClick={this.submitTracks.bind(this)} type="submit" color="secondary" className={classes.button}>
                     Submit
-                </Button> 
+                </Button>
                 <Button variant="contained" onClick={this.handleClose.bind(this)} color="secondary" className={classes.button}>
                     Cancel
-                </Button>  
+                </Button>
             </div>
         )
     }
 
-    /*renderTrackDetailsForm(classes){
-        if(this.state.trackDetails === null){
-            return null;
-        }
-         
-        return (
-            <form>
-                <div className={classes.trackDetailsContainer}>
-                    <Divider className={classes.trackDetailsDivider}/>
-                    <TrackField className={classes.TrackDetailsTextField} label="Album">
-                        {this.state.trackDetails.album.name}
-                    </TrackField>
-                    <TrackField className={classes.TrackDetailsTextField} label="Year">
-                        {this.state.trackDetails.album['release_date'].split('-')[0]}
-                    </TrackField>
-                    <TrackField className={classes.TrackDetailsTextField} label="Artist">
-                        {this.state.trackDetails.artists.map(artist => artist.name).join(', ')}
-                    </TrackField>
-                    <TrackField className={classes.TrackDetailsTextField} label="Title">
-                        {this.state.trackDetails.name}
-                    </TrackField>
-                    <TrackField className={classes.TrackDetailsTextField} label="Track #">
-                        {this.state.trackDetails['track_number']}
-                    </TrackField>
-                    <TrackField className={classes.TrackDetailsTextField} label="Duration">
-                        {this.calculateTrackDuration(this.state.trackDetails['duration_ms'])}
-                    </TrackField>
-                    <Divider className={classes.trackDetailsDivider}/>
-                </div>
-                {this.renderButtons(classes)}
-            </form>
-        )
-    }*/
     render() {
         const { classes } = this.props;
 
@@ -413,7 +362,7 @@ class AddNewTrack extends Component {
                             {this.renderGetTrackDetailsForm(classes)}
                             {this.renderValidationError(classes)}
                             {this.renderTracksTable(classes)}
-                            
+
                         </div>
                     </div>
                 </Modal>

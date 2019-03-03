@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import LinearProgress from '@material-ui/core/LinearProgress';
-import SpotifyWebApi from 'spotify-web-api-js';
 import Script from 'react-load-script';
 
 import Provider from  '../../providerConfig';
@@ -16,8 +15,6 @@ import {
   updateCurrentTrack as updateCurrentTrackAction,
 } from '../../actions/playerAction';
 
-let spotify = new SpotifyWebApi();
-
 const spotifyApi = new SpotifyApi();
 let player = null;
 const styles = {
@@ -25,7 +22,6 @@ const styles = {
     flexGrow: 1,
   }
 };
-
 
 class Spotify extends Component {
 
@@ -101,13 +97,12 @@ class Spotify extends Component {
       player.addListener('ready', ({ device_id: deviceId }) => {
         console.log('Ready with Device ID', deviceId);
 
-        const { updateCurrentDevice, currentTrack } = this.props;
+        const { updateCurrentDevice } = this.props;
         updateCurrentDevice(deviceId);
 
         this.setState({
           playerReady: true,
         });
-        // this.play(currentTrack.trackId);
       });
 
       // Not Ready

@@ -8,9 +8,7 @@ import { rotatein } from 'react-animations';
 import classNames from 'classnames';
 import { updateCurrentTrack } from '../actions/playerAction';
 
-const { PlayPause, CurrentTime, MuteUnmute, SeekBar, Progress, Volume, Duration} = controls
-
-const buttonGradientBackground = 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)';
+const { PlayPause, CurrentTime, MuteUnmute, SeekBar, Volume, Duration} = controls
 
 const styles = theme => ({
   '@keyframes rotatein': rotatein,
@@ -77,7 +75,7 @@ const styles = theme => ({
   }
 });
 
-class MusicPlayer extends Component {  
+class MusicPlayer extends Component {
 
   render() {
     const { classes } = this.props;
@@ -92,20 +90,20 @@ class MusicPlayer extends Component {
          {/****** main player container *******/}
          <Grid container
           className={classes.playerMainContainer}
-          direction='row' 
+          direction='row'
           justify='center'
           alignItems='center'>
           <Grid container
-           className={classes.playerAlbumInfoContainer} 
+           className={classes.playerAlbumInfoContainer}
            justify='center'
            alignItems='center'>
             <Grid item className={classes.albumThumbnailContainer} >
-              <Avatar alt={this.props.currentTrack.album} 
-              src={this.props.currentTrack.albumThumbnail} 
+              <Avatar alt={this.props.currentTrack.album}
+              src={this.props.currentTrack.albumThumbnail}
               className={classNames(classes.albumThumbnail, classes.albumAnimation)} />
             </Grid>
             <Grid container
-            className={classes.playerTrackInfoContainer} 
+            className={classes.playerTrackInfoContainer}
             direction='column'
             justify='center'
             alignItems='flex-start'>
@@ -126,17 +124,17 @@ class MusicPlayer extends Component {
               </Grid>
             </Grid>
           </Grid>
-          <Grid container 
-         className={classes.ControlsMainContainer} 
+          <Grid container
+         className={classes.ControlsMainContainer}
          direction='row'
          justify='center'
          alignItems='center'>
-            <Grid container 
+            <Grid container
               className={classes.playerTopControlsContainer}
               justify='center'
               direction='row'
               alignItems='center'>
-              <Grid container 
+              <Grid container
               className={classes.playerTopControlsLeftContainer}
               justify='flex-end'
               alignItems='center'
@@ -173,7 +171,7 @@ class MusicPlayer extends Component {
                 </IconButton>
               </Grid>
             </Grid>
-              <Grid container 
+              <Grid container
               className={classes.playerTopControlsRightContainer}
               justify='flex-start'
               alignItems='center'
@@ -187,7 +185,7 @@ class MusicPlayer extends Component {
             </Grid>
             </Grid>
             </Grid>
-            <Grid container 
+            <Grid container
             className={classes.playerBottomControlsContainer}
             justify='center'
             alignItems='center'>
@@ -203,14 +201,14 @@ class MusicPlayer extends Component {
           </Grid>
          </Grid>
         </Grid>
-      
+
         </div>
       </Media>
     </Paper>
-  
+
     );
   }
-  
+
 }
 
 const mapStateToProps = state => ({

@@ -64,7 +64,7 @@ class Login extends Component {
                             type="password"
                             onChange={this.handleChange}
                         />
-                        <div className="form-item-footer"><a href="" onClick={
+                        <div className="form-item-footer"><a href="/" onClick={
                             (e) => {e.preventDefault(); this.props.toggler();}
                         }>Not registered? Signup</a></div>
                         <input

@@ -14,9 +14,7 @@ import {
   Grid,
   Button,
   Icon,
-  Chip,
   AppBar,
-  Switch,
   Snackbar,
   Divider,
 } from '@material-ui/core';
@@ -25,13 +23,8 @@ import green from '@material-ui/core/colors/green';
 import LongMenu from './LongMenu';
 import {
   updateCurrentTrack as updateCurrentTrackAction,
-  updatePlayerState as updatePlayerStateAction,
   storeAllTracks as storeAllTracksAction,
 } from '../actions/playerAction';
-import SpotifyApi from '../api/spotify';
-
-const token = 'BQCEgGDO5KKUuD6BvfR1vQdASUPFHOx0AIFHjrra0Jr5PnY1mZ2gBsdWFPFi49iXsgYcPxQSeUODTyMTEQhDmHa9-xKl5sneO2thYO-Ich0RWWucIboeE8Jp2e-2pFpFT9MQPKZmKjKdzpiCNnkWWbUG3P5w43-6LKZVf6pqvyT3qB2k1TUtfeEX';
-const buttonGradientBackground = 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)';
 
 const styles = theme => ({
   subGenreContainer: {
@@ -261,24 +254,12 @@ class CoreGenre extends Component {
   }
 
   playItOnSpotify = (track) => {
-    const { player, deviceId, updatePlayerState } = this.props;
-
     let accessToken = localStorage.getItem('mm_spotify_access_token');
     if (accessToken) {
       this.setState({
         currentTrack: track,
         showPlayer: true,
       });
-
-      if (player) {
-        // OPTIONAL: Allow for play right after clicking new track
-        // const spotifyApi = new SpotifyApi();
-
-        // spotifyApi.fetchTrack(deviceId, track.trackId);
-        // updatePlayerState({
-        //   isPlaying: true,
-        // });
-      }
     } else {
       console.log("going to get new token from spotify")
       this.getSpotifyAccessToken();
@@ -293,9 +274,11 @@ class CoreGenre extends Component {
     let hashParams = {};
     let e, r = /([^&;=]+)=?([^&;]*)/g,
       q = window.location.hash.substring(1);
-    while ( e = r.exec(q)) {
+    e = r.exec(q);
+    while (e) {
       console.log(e);
       hashParams[e[1]] = decodeURIComponent(e[2]);
+      e = r.exec(q);
     }
     return hashParams;
   }
@@ -413,7 +396,7 @@ class CoreGenre extends Component {
     }
   }
   render(){
-    const { classes, playerType } = this.props;
+    const { classes } = this.props;
 
     return (
       <>
@@ -484,24 +467,20 @@ const mapStateToProps = (state) => ({
   playerType: state.player.playerType,
   tracks: state.player.tracks,
   player: state.player.player,
-  deviceId: state.player.deviceId,
 });
 
 const mapDispatchToProps = {
   updateCurrentTrack: updateCurrentTrackAction,
   storeAllTracks: storeAllTracksAction,
-  updatePlayerState: updatePlayerStateAction,
 };
 
 CoreGenre.propTypes = {
   classes: PropTypes.object.isRequired,
   tracks: PropTypes.arrayOf(PropTypes.object),
   updateCurrentTrack: PropTypes.func,
-  updatePlayerState: PropTypes.func,
   storeAllTracks: PropTypes.func,
   playerType: PropTypes.string,
   player: PropTypes.object,
-  deviceId: PropTypes.string,
 };
 
 
