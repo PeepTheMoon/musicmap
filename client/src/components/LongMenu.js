@@ -5,7 +5,7 @@ import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import MenuIcon from '@material-ui/icons/Menu';
 
-const ITEM_HEIGHT = 48;
+const ITEM_HEIGHT = 40;
 
 class LongMenu extends React.Component {
   state = {
@@ -28,6 +28,7 @@ class LongMenu extends React.Component {
     return (
       <div>
         <IconButton
+          style={{ height: '40px', padding: '8px 12px' }}
           aria-label="More"
           aria-owns={open ? 'long-menu' : undefined}
           aria-haspopup="true"

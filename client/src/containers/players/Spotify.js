@@ -40,7 +40,9 @@ class Spotify extends Component {
       isPlaying: false,
       isMuted: false,
       isShuffle: false,
+      isRepeat: false,
       currentTrack: undefined,
+      lastVolume: 50,
     }
   }
 
@@ -232,20 +234,34 @@ class Spotify extends Component {
     });
   }
 
+  toggleRepeat = () => {
+    const { isRepeat } = this.state;
+    this.setState({
+      isRepeat: !isRepeat,
+    });
+  }
+
   muteUnmute = () => {
-    const { isMuted } = this.state;
-    const { volume } = this.props;
+    const { isMuted, lastVolume } = this.state;
+    const { volume, updatePlayerState } = this.props;
     if (isMuted) {
-      player.setVolume(volume / 100.).then(() => {
+      updatePlayerState({
+        volume: lastVolume,
+      });
+      player.setVolume(lastVolume / 100.).then(() => {
         console.log('Mute turned off and volume reset to: ' + volume);
       })
     } else {
+      updatePlayerState({
+        volume: 0,
+      });
       player.setVolume(0).then(() => {
         console.log('Player was muted');
       });
     }
     this.setState({
       isMuted: !isMuted,
+      lastVolume: volume,
     });
   }
 
@@ -283,6 +299,7 @@ class Spotify extends Component {
   render() {
     const {
       classes,
+      volume,
     } = this.props;
 
     return (
@@ -297,11 +314,14 @@ class Spotify extends Component {
           next={this.next}
           prev={this.prev}
           volume={this.volume}
+          volumeAmount={volume}
           toggleShuffle={this.toggleShuffle}
+          toggleRepeat={this.toggleRepeat}
           muteUnmute={this.muteUnmute}
           isPlaying={this.state.isPlaying}
           isMuted={this.state.isMuted}
           isShuffle={this.state.isShuffle}
+          isRepeat={this.state.isRepeat}
         />
       </div>
     );

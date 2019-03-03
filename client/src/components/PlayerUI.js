@@ -14,7 +14,7 @@ const buttonGradientBackground = 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90
 const styles = theme => ({
   '@keyframes rotatein': rotatein,
   playerContainer: {
-    backgroundColor: '#EFEFEF',
+    backgroundColor: '#EDECEF',
     height: '60px',
     width: '100%',
     position: 'fixed',
@@ -89,12 +89,19 @@ const styles = theme => ({
     fontWeight: 'bold',
     fontSize: '12px',
     width: '100%',
-    textAlign: 'center',
+    textAlign: 'left',
+    paddingLeft: '10px',
   },
   playerIcon: {
     fontFamily: 'icomoon',
     fontSize: '12px',
     color: 'black',
+  },
+  rightPadding: {
+    paddingRight: '20px',
+  },
+  leftPadding: {
+    paddingLeft: '20px',
   },
   playerIconActive: {
     fontFamily: 'icomoon',
@@ -117,7 +124,6 @@ class PlayerUI extends Component {
     super(props);
     this.state = {
       isPlaying: false,
-      volumeAmount: 50,
       timerId: 0,
     }
   }
@@ -125,12 +131,13 @@ class PlayerUI extends Component {
   _handlePlay = (track) => {
     const {
       play,
+      isRepeat,
     } = this.props;
 
     play(track.trackId);
 
     const timerId = setInterval(() => {
-      const { sliderAmount, player } = this.props;
+      const { sliderAmount, player, isRepeat } = this.props;
       const { isPlaying } = this.state;
 
       player.getCurrentState().then((state) => {
@@ -139,7 +146,13 @@ class PlayerUI extends Component {
           this.formatCurrentTime(Math.round(state.position / 1000));
 
           if (isPlaying && state.position === 0 && state.paused) {
-            this._handleNext();
+            if (isRepeat) {
+              this.formatCurrentTime(0);
+              this._handlePause();
+              this._handlePlay(track);
+            } else {
+              this._handleNext();
+            }
           } else if (isPlaying && state.paused) {
             this._handlePause();
           }
@@ -184,6 +197,11 @@ class PlayerUI extends Component {
     toggleShuffle();
   }
 
+  _handleRepeat = () => {
+    const { toggleRepeat } = this.props;
+    toggleRepeat();
+  }
+
   _handlePause = () => {
     const {
       pause,
@@ -204,10 +222,6 @@ class PlayerUI extends Component {
     } = this.props;
 
     volume(e.target.value);
-
-    this.setState({
-      volumeAmount: e.target.value,
-    });
   }
 
   handleSliderChange = (position) => {
@@ -222,7 +236,7 @@ class PlayerUI extends Component {
   }
 
   _handleMuteUnmute = () => {
-    const { muteUnmute } = this.props;
+    const { muteUnmute, isMuted } = this.props;
     muteUnmute();
   }
 
@@ -250,10 +264,11 @@ class PlayerUI extends Component {
       sliderAmount,
       isMuted,
       isShuffle,
+      isRepeat,
+      volumeAmount: volumePercent,
     } = this.props;
 
     const {
-      volumeAmount,
       isPlaying,
       timerId,
     } = this.state;
@@ -266,8 +281,6 @@ class PlayerUI extends Component {
     const totalSeconds = (+duration[0]) * 60 + (+duration[1]);
     const sliderPercent = sliderAmount/totalSeconds * 100.;
 
-    const volumePercent = volumeAmount;
-
     const rangeStyles = StyleSheet.create({
       sliderStyles: {
         backgroundImage: `
@@ -277,6 +290,7 @@ class PlayerUI extends Component {
       },
       volumeStyles: {
         width: '100%',
+        maxWidth: '100px',
         backgroundImage: `
           -webkit-gradient(linear, left top, right top, color-stop(${volumePercent}%, #4F4F4F), color-stop(${volumePercent}%, #FFFFFF));
           -moz-linear-gradient(left center, #4F4F4F 0%, #4F4F4F ${volumePercent}%, #FFFFFF ${volumePercent}%, #FFFFFF 100%)`,
@@ -347,7 +361,7 @@ class PlayerUI extends Component {
                   </Grid>
                   <Grid item>
                     <IconButton aria-label="Next" >
-                      <div onClick={this._handleNext} className={classNames(classes.playerIcon, 'icon-mm-icon-next')} />
+                      <div onClick={this._handleNext} className={classNames(classes.playerIcon, classes.rightPadding, 'icon-mm-icon-next')} />
                     </IconButton>
                   </Grid>
 
@@ -369,7 +383,10 @@ class PlayerUI extends Component {
                   </Grid>
                   <Grid item>
                     <IconButton aria-label="Loop" >
-                      <div className={classNames(classes.playerIcon, 'icon-mm-icon-loop')} />
+                      <div
+                        onClick={this._handleRepeat}
+                        className={classNames(isRepeat ? classes.playerIconActive : classes.playerIcon, classes.leftPadding, 'icon-mm-icon-repeat')}
+                      />
                     </IconButton>
                   </Grid>
                   <Grid item>
@@ -403,7 +420,7 @@ class PlayerUI extends Component {
                       step={0.01}
                       min={0}
                       max={100}
-                      value={volumeAmount}
+                      value={volumePercent}
                       onChange={this.handleVolumeChange}
                       className={css(rangeStyles.volumeStyles)}
                     />
@@ -417,7 +434,7 @@ class PlayerUI extends Component {
                  >
                   <Grid>
                     <IconButton aria-label="More">
-                      <div className={classNames(classes.playerIcon, 'icon-mm-icon-hamburger')} />
+                      <div className={classNames(classes.playerIcon, classes.rightPadding, 'icon-mm-icon-hamburger')} />
                     </IconButton>
                   </Grid>
                 </Grid>
@@ -448,10 +465,12 @@ PlayerUI.propTypes = {
   next: PropTypes.func,
   prev: PropTypes.func,
   toggleShuffle: PropTypes.func,
+  toggleRepeat: PropTypes.func,
   muteUnmute: PropTypes.func,
   isPlaying: PropTypes.bool,
   isMuted: PropTypes.bool,
   isShuffle: PropTypes.bool,
+  isRepeat: PropTypes.bool,
 };
 
 export default withStyles(styles)(connect(mapStateToProps, { updateCurrentTrack, updatePlayerState })(PlayerUI));

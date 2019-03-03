@@ -93,7 +93,7 @@ const styles = theme => ({
     fontSize: '14px',
   },
   icon: {
-    margin: theme.spacing.unit,
+    marginLeft: theme.spacing.unit,
     color: '#A0A0A0',
     '&:hover': {
       color: green[200],
@@ -108,7 +108,7 @@ const styles = theme => ({
     lineHeight: '1',
   },
   itemRow: {
-    height: 'auto'
+    height: '40px',
   },
   statusChip: {
   },
@@ -129,6 +129,7 @@ const styles = theme => ({
     borderBottom: 'none',
     fontWeight: 'bold',
     color: 'black',
+    padding: '0',
   },
   genreMetadata : {
     marginTop: theme.spacing.unit
@@ -140,6 +141,8 @@ const styles = theme => ({
   emptyCell: {
     width: '10%',
     borderBottom: 'none',
+    padding: '0',
+    height: '40px',
   },
   genreScore: {
     fontSize: '14px',
@@ -150,7 +153,7 @@ const styles = theme => ({
     color: '#A0A0A0',
     verticalAlign: 'middle',
     paddingRight: '20px',
-    paddingLeft: '30px',
+    paddingLeft: '10px',
     display: 'table-cell !important',
   },
   songInfo: {
@@ -167,10 +170,12 @@ const styles = theme => ({
   },
   menuIcon: {
     display: 'inline-block',
+    height: '40px',
     width: '5%',
   },
   trackCell: {
     padding: '0',
+    height: '40px',
   },
 });
 
@@ -385,9 +390,9 @@ class CoreGenre extends Component {
               <TableCell className={classes.trackCell} style={{ width: '5%' }}>
                 <div className={classes.durationTime}>
                   {track.duration}
-                </div>
-                <div className={classes.menuIcon}>
-                  <LongMenu options={TRACK_OPTIONS} />
+                  <div className={classes.menuIcon}>
+                    <LongMenu options={TRACK_OPTIONS} />
+                  </div>
                 </div>
               </TableCell>
               <TableCell className={classes.emptyCell}>&nbsp;</TableCell>
