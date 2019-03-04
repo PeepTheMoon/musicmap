@@ -350,26 +350,26 @@ class PlayerUI extends Component {
                   direction='row'
                 >
                   <Grid item>
-                    <IconButton aria-label="Previous" >
-                      <div onClick={this._handlePrev} className={classNames(classes.playerIcon, 'icon-mm-icon-previous')} />
+                    <IconButton aria-label="Previous" onClick={this._handlePrev}>
+                      <div className={classNames(classes.playerIcon, 'icon-mm-icon-previous')} />
                     </IconButton>
                   </Grid>
                   <Grid item>
                     {isPlaying ?
                         (
-                          <IconButton aria-label="Pause">
-                            <div onClick={this._handlePause} className={classNames(classes.playerIcon, 'icon-mm-icon-pause')} />
+                          <IconButton aria-label="Pause" onClick={this._handlePause}>
+                            <div className={classNames(classes.playerIcon, 'icon-mm-icon-pause')} />
                           </IconButton>
                         ) : (
-                          <IconButton aria-label="Play">
-                            <div onClick={() => this._handlePlay(currentTrack)} className={classNames(classes.playerIcon, 'icon-mm-icon-play')} />
+                          <IconButton aria-label="Play" onClick={() => this._handlePlay(currentTrack)}>
+                            <div className={classNames(classes.playerIcon, 'icon-mm-icon-play')} />
                           </IconButton>
                         )
                     }
                   </Grid>
                   <Grid item className={classNames(classes.rightPadding)}>
-                    <IconButton aria-label="Next" >
-                      <div onClick={this._handleNext} className={classNames(classes.playerIcon, 'icon-mm-icon-next')} />
+                    <IconButton aria-label="Next" onClick={this._handleNext}>
+                      <div className={classNames(classes.playerIcon, 'icon-mm-icon-next')} />
                     </IconButton>
                   </Grid>
 
@@ -390,17 +390,15 @@ class PlayerUI extends Component {
                     <p className={classes.timer}> {currentTrack.duration}</p>
                   </Grid>
                   <Grid item className={classes.leftPadding}>
-                    <IconButton aria-label="Loop" >
+                    <IconButton aria-label="Loop" onClick={this._handleRepeat}>
                       <div
-                        onClick={this._handleRepeat}
                         className={classNames(isRepeat ? classes.playerIconActive : classes.playerIcon, 'icon-mm-icon-repeat')}
                       />
                     </IconButton>
                   </Grid>
                   <Grid item>
-                    <IconButton aria-label="Shuffle" >
+                    <IconButton aria-label="Shuffle" onClick={this._handleShuffle}>
                       <div
-                        onClick={this._handleShuffle}
                         className={classNames(isShuffle ? classes.playerIconActive : classes.playerIcon, 'icon-mm-icon-shuffle')}
                       />
                     </IconButton>
@@ -409,12 +407,12 @@ class PlayerUI extends Component {
                   <Grid item className={classes.volume}>
                     {!isMuted ?
                       (
-                        <IconButton aria-label="Mute" >
-                          <div onClick={this._handleMuteUnmute} className={classNames(classes.playerIcon, 'icon-mm-icon-volume')} />
+                        <IconButton aria-label="Mute" onClick={this._handleMuteUnmute}>
+                          <div className={classNames(classes.playerIcon, 'icon-mm-icon-volume')} />
                         </IconButton>
                       ) : (
-                        <IconButton aria-label="Unmute" >
-                          <div onClick={this._handleMuteUnmute} className={classNames(classes.playerIcon, 'icon-mm-icon-mute')} />
+                        <IconButton aria-label="Unmute" onClick={this._handleMuteUnmute}>
+                          <div className={classNames(classes.playerIcon, 'icon-mm-icon-mute')} />
                         </IconButton>
                       )
                     }
