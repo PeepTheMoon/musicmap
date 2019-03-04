@@ -107,6 +107,7 @@ const styles = theme => ({
   },
   sliderItem: {
     width: '60%',
+    marginTop: '-5px',
     [theme.breakpoints.down('md')]: {
       width: '30%',
     },
