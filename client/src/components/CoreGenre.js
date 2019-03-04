@@ -225,6 +225,7 @@ class CoreGenre extends Component {
             duration: item.duration
           }
         });
+
       storeAllTracks(tracks);
 
       this.setState({
@@ -396,8 +397,9 @@ class CoreGenre extends Component {
     }
   }
   render(){
-    const { classes } = this.props;
+    const { classes, tracks } = this.props;
 
+    const loadedTracks = tracks || [];
     return (
       <>
       <div className={classes.subGenreContainer}>
@@ -417,7 +419,7 @@ class CoreGenre extends Component {
                 <div className={classes.genreMetadata}>
                   <Icon className={classNames(classes.headerIcon, 'fa fa-sign-out-alt')} />
                   <div className={classes.songInfo}>
-                    <div>Number of songs: {this.state.tracks.length}</div>
+                    <div>Number of songs: {loadedTracks.length}</div>
                     <div>Duration: {this.state.totalDuration}</div>
                   </div>
                 </div>

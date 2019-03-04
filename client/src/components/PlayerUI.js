@@ -87,7 +87,7 @@ const styles = theme => ({
     fontSize: '12px',
     width: '100%',
     textAlign: 'left',
-    paddingLeft: '10px',
+    paddingLeft: '20px',
   },
   playerIcon: {
     fontFamily: 'icomoon',
@@ -366,9 +366,9 @@ class PlayerUI extends Component {
                         )
                     }
                   </Grid>
-                  <Grid item>
+                  <Grid item className={classNames(classes.rightPadding)}>
                     <IconButton aria-label="Next" >
-                      <div onClick={this._handleNext} className={classNames(classes.playerIcon, classes.rightPadding, 'icon-mm-icon-next')} />
+                      <div onClick={this._handleNext} className={classNames(classes.playerIcon, 'icon-mm-icon-next')} />
                     </IconButton>
                   </Grid>
 
@@ -388,11 +388,11 @@ class PlayerUI extends Component {
                   <Grid item>
                     <p className={classes.timer}> {currentTrack.duration}</p>
                   </Grid>
-                  <Grid item>
+                  <Grid item className={classes.leftPadding}>
                     <IconButton aria-label="Loop" >
                       <div
                         onClick={this._handleRepeat}
-                        className={classNames(isRepeat ? classes.playerIconActive : classes.playerIcon, classes.leftPadding, 'icon-mm-icon-repeat')}
+                        className={classNames(isRepeat ? classes.playerIconActive : classes.playerIcon, 'icon-mm-icon-repeat')}
                       />
                     </IconButton>
                   </Grid>
@@ -439,9 +439,9 @@ class PlayerUI extends Component {
                   alignItems='center'
                   direction='row'
                  >
-                  <Grid>
+                  <Grid className={classes.rightPadding}>
                     <IconButton aria-label="More">
-                      <div className={classNames(classes.playerIcon, classes.rightPadding, 'icon-mm-icon-hamburger')} />
+                      <div className={classNames(classes.playerIcon, 'icon-mm-icon-hamburger')} />
                     </IconButton>
                   </Grid>
                 </Grid>
