@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
+    "babel-plugin-dotenv-import": "^2.0.0",
     "bcrypt": "^3.0.3",
     "bigchaindb-driver": "^4.1.0",
     "cors": "^2.8.4",
