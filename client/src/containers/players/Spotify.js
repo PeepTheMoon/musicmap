@@ -308,6 +308,7 @@ class Spotify extends Component {
           seek={this.seek}
           next={this.next}
           prev={this.prev}
+          resume={this.resume}
           volume={this.volume}
           volumeAmount={volume}
           toggleShuffle={this.toggleShuffle}

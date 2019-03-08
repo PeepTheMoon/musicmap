@@ -87,7 +87,7 @@ const styles = theme => ({
     fontSize: '12px',
     width: '100%',
     textAlign: 'left',
-    paddingLeft: '20px',
+    paddingLeft: '40px',
   },
   playerIcon: {
     fontFamily: 'icomoon',
@@ -97,13 +97,16 @@ const styles = theme => ({
   rightPadding: {
     paddingRight: '20px',
   },
+  hamburgerPadding: {
+    paddingRight: '40px',
+  },
   leftPadding: {
     paddingLeft: '20px',
   },
   playerIconActive: {
     fontFamily: 'icomoon',
     fontSize: '12px',
-    color: 'green',
+    color: '#f12034',
   },
   sliderItem: {
     width: '60%',
@@ -138,12 +141,13 @@ class PlayerUI extends Component {
     window.removeEventListener('newTrackSelected');
   }
 
-  _handlePlay = (track) => {
+  _handlePlay = (track, resumePlay=false) => {
     const {
       play,
+      resume,
     } = this.props;
 
-    play(track.trackId);
+    resumePlay ? resume() : play(track.trackId);
 
     const timerId = setInterval(() => {
       const { player, isRepeat } = this.props;
@@ -361,7 +365,7 @@ class PlayerUI extends Component {
                             <div className={classNames(classes.playerIcon, 'icon-mm-icon-pause')} />
                           </IconButton>
                         ) : (
-                          <IconButton aria-label="Play" onClick={() => this._handlePlay(currentTrack)}>
+                          <IconButton aria-label="Play" onClick={() => this._handlePlay(currentTrack, true)}>
                             <div className={classNames(classes.playerIcon, 'icon-mm-icon-play')} />
                           </IconButton>
                         )
@@ -438,7 +442,7 @@ class PlayerUI extends Component {
                   alignItems='center'
                   direction='row'
                  >
-                  <Grid className={classes.rightPadding}>
+                  <Grid className={classes.hamburgerPadding}>
                     <IconButton aria-label="More">
                       <div className={classNames(classes.playerIcon, 'icon-mm-icon-hamburger')} />
                     </IconButton>
@@ -470,6 +474,7 @@ PlayerUI.propTypes = {
   volume: PropTypes.func,
   next: PropTypes.func,
   prev: PropTypes.func,
+  resume: PropTypes.func,
   toggleShuffle: PropTypes.func,
   toggleRepeat: PropTypes.func,
   muteUnmute: PropTypes.func,

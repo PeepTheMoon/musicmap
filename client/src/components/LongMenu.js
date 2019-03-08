@@ -26,9 +26,9 @@ class LongMenu extends React.Component {
     const open = Boolean(anchorEl);
 
     return (
-      <div>
+      <div style={{ marginRight: '-10px', marginTop: '-4px' }}>
         <IconButton
-          style={{ height: '40px', padding: '8px 12px' }}
+          style={{ height: '40px' }}
           aria-label="More"
           aria-owns={open ? 'long-menu' : undefined}
           aria-haspopup="true"

@@ -159,12 +159,17 @@ const styles = theme => ({
   },
   durationTime: {
     display: 'inline-block',
-    width: '95%',
+    width: '100%',
+    textAlign: 'right',
+  },
+  durationHeader: {
+    textAlign: 'right',
   },
   menuIcon: {
     display: 'inline-block',
     height: '40px',
-    width: '5%',
+    width: '100%',
+    textAlign: 'right',
   },
   trackCell: {
     padding: '0',
@@ -360,7 +365,8 @@ class CoreGenre extends Component {
               <TableCell className={classes.playlistHeaderCell}>Artist</TableCell>
               <TableCell className={classes.playlistHeaderCell}>Album</TableCell>
               <TableCell className={classes.playlistHeaderCell}>Year</TableCell>
-              <TableCell className={classes.playlistHeaderCell}>Duration</TableCell>
+              <TableCell className={classNames(classes.playlistHeaderCell, classes.durationHeader)}>Duration</TableCell>
+              <TableCell className={classes.playlistHeaderCell}>&nbsp;</TableCell>
               <TableCell className={classes.emptyCell}>&nbsp;</TableCell>
             </TableRow>
           </TableHead>
@@ -374,12 +380,14 @@ class CoreGenre extends Component {
               <TableCell className={classes.trackCell}>{track.artists}</TableCell>
               <TableCell className={classes.trackCell}>{track.album}</TableCell>
               <TableCell className={classes.trackCell}>{track.year}</TableCell>
-              <TableCell className={classes.trackCell} style={{ width: '5%' }}>
-                <div className={classes.durationTime}>
+              <TableCell className={classes.trackCell}>
+                <div className={classNames(classes.durationTime)}>
                   {track.duration}
-                  <div className={classes.menuIcon}>
-                    <LongMenu options={TRACK_OPTIONS} />
-                  </div>
+                </div>
+              </TableCell>
+              <TableCell className={classes.trackCell}>
+                <div className={classes.menuIcon}>
+                  <LongMenu options={TRACK_OPTIONS} />
                 </div>
               </TableCell>
               <TableCell className={classes.emptyCell}>&nbsp;</TableCell>
