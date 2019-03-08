@@ -327,9 +327,15 @@ class CoreGenre extends Component {
     });
   }
 
-  addNewTrack(){
+  addNewTrack = () => {
     this.setState({
-      showNewTrackForm: true
+      showNewTrackForm: true,
+    });
+  }
+
+  closeNewTrackForm = () => {
+    this.setState({
+      showNewTrackForm: false,
     });
   }
 
@@ -466,7 +472,7 @@ class CoreGenre extends Component {
       {(this.state.showPlayer || window.location.href.includes("callback/")) ? (
           <PlayerContainer playerType="spotify" />
         ) : null}
-      <AddNewTrack show={this.state.showNewTrackForm} />
+      <AddNewTrack show={this.state.showNewTrackForm} onClose={this.closeNewTrackForm} />
     </>
     );
   }

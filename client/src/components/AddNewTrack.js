@@ -82,14 +82,16 @@ class AddNewTrack extends Component {
     }
 
     handleClose = () => {
-        this.setState({ show: false, trackDetails: null });
+        const { onClose } = this.props;
+        this.setState({ trackDetails: null });
+        onClose();
     };
 
 
     componentWillReceiveProps(nextProps){
         if(nextProps.show !== this.state.show){
             this.setState({
-                show:nextProps.show
+                show: nextProps.show
             })
         }
     }
@@ -342,6 +344,7 @@ class AddNewTrack extends Component {
             )
     }
     renderButtons(classes){
+        const { onClose } = this.props;
         return (
             <div className={classes.btnContainer}>
                 <Button variant="contained" onClick={this.submitTracks.bind(this)} type="submit" color="secondary" className={classes.button}>
