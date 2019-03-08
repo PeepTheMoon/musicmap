@@ -16,6 +16,20 @@ const customTheme = createMuiTheme({
     },
     typography: {
         useNextVariants: true,
+        fontFamily: [
+            "liberation_sansregular",
+            "-apple-system",
+            "BlinkMacSystemFont",
+            "Segoe UI",
+            "Roboto",
+            "Oxygen",
+            "Ubuntu",
+            "Cantarell",
+            "Fira Sans",
+            "Droid Sans",
+            "Helvetica Neue",
+            "sans-serif",
+        ],
     }
 })
 
