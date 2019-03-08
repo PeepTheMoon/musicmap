@@ -109,7 +109,7 @@ const styles = theme => ({
     color: '#f12034',
   },
   sliderItem: {
-    width: '60%',
+    width: '50%',
     marginTop: '-5px',
     [theme.breakpoints.down('md')]: {
       width: '30%',
