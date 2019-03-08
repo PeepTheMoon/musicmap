@@ -1,9 +1,12 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import { Modal, Typography, TextField,
     Button, Grid, SvgIcon, IconButton,
     Table, TableBody, TableCell, TableRow, Paper,
     TableHead, Checkbox } from '@material-ui/core';
+
+import { storeAllTracks as storeAllTracksAction } from '../actions/playerAction';
 
 const user = "whitedragon1234";
 const styles = theme => ({
@@ -178,7 +181,9 @@ class AddNewTrack extends Component {
 
     submitTracks(e){
         e.preventDefault();
-        const {tracks, selectedTracks} = this.state;
+        const { tracks, selectedTracks } = this.state;
+        const { currentTracks, storeAllTracks } = this.props;
+
         let tracksToSend = tracks.map(t => {
             if(selectedTracks.indexOf(t.trackId) !== -1) {
                 return t;
@@ -201,7 +206,10 @@ class AddNewTrack extends Component {
             body: JSON.stringify(_body)
         })
         .then(resp => resp.json())
-        .then(data => console.log(data));
+        .then(data => {
+            console.log(data);
+            storeAllTracks(currentTracks.concat(tracksToSend));
+        });
     }
     renderValidationError(classes){
         if(!this.state.isValidationError){
@@ -372,4 +380,12 @@ class AddNewTrack extends Component {
 
 }
 
-export default withStyles(styles)(AddNewTrack);
+const mapStateToProps = (state) => ({
+  currentTracks: state.player.tracks,
+});
+
+const mapDispatchToProps = {
+  storeAllTracks: storeAllTracksAction,
+};
+
+export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(AddNewTrack));
