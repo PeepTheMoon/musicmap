@@ -7,11 +7,11 @@ import fs from 'fs';
 import path from 'path';
 import cors from 'cors';
 import passport from 'passport';
-import { 
+import {
         HTTP_SERVER_PORT,
         SERVER_KEY_PATH,
         SERVER_CRT_PATH,
-        CA_CRT_PATH } from 'babel-dotenv';
+        CA_CRT_PATH } from '@env';
 import { authRouter, spotifyRouter, unknownRouter, trackRouter } from './routes';
 import { handleErrors } from './middlewares/errorHandler';
 const db = require('./db-connect.js');

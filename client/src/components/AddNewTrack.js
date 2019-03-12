@@ -344,7 +344,6 @@ class AddNewTrack extends Component {
             )
     }
     renderButtons(classes){
-        const { onClose } = this.props;
         return (
             <div className={classes.btnContainer}>
                 <Button variant="contained" onClick={this.submitTracks.bind(this)} type="submit" color="secondary" className={classes.button}>
