@@ -8,6 +8,9 @@ install:
   - cd ../server
   - npm install
 
+services:
+  - mongodb
+
 script:
   - cd ../client
   - npm run test
