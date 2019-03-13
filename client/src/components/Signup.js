@@ -20,7 +20,7 @@ class Signup extends Component {
     }
 
     handleChange(e) {
-        if (e.target.name == "username") {
+        if (e.target.name === "username") {
             this.setState(
                 {
                     [e.target.name]: e.target.value
@@ -72,7 +72,7 @@ class Signup extends Component {
             this.state.email &&                                 // email is entered
             this.state.password &&                              // password is entered
             this.state.repeatPassword &&                        // password is repeated
-            this.state.password == this.state.repeatPassword    // repeated password is same as the password
+            this.state.password === this.state.repeatPassword    // repeated password is same as the password
         );
 
         return (
@@ -116,11 +116,10 @@ class Signup extends Component {
                         />
                         {this.state.repeatPassword &&
                             <div
-                                className="form-item-footer"
-                                className={this.state.password == this.state.repeatPassword ? "form-item-footer success" : "form-item-footer failure"}
-                            >{this.state.password == this.state.repeatPassword ? "Passwords match" : "Passwords do not match"}</div>
+                                className={this.state.password === this.state.repeatPassword ? "form-item-footer success" : "form-item-footer failure"}
+                            >{this.state.password === this.state.repeatPassword ? "Passwords match" : "Passwords do not match"}</div>
                         }
-                        <div className="form-item-footer"><a href="" onClick={
+                        <div className="form-item-footer"><a href="/" onClick={
                             (e) => {e.preventDefault(); this.props.toggler();}
                         }>Already registered? Login</a></div>
                         <input

@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import withMediaProps from '../decorators/with-media-props';
 import { withStyles } from '@material-ui/core/styles';
 
@@ -62,7 +61,6 @@ class SeekBar extends Component {
   render() {
     const { classes, media } = this.props
     const { duration, currentTime } = media
-    {/* (currentTime * 100 / duration) */}
     return (
       <input
         type="range"
@@ -75,7 +73,7 @@ class SeekBar extends Component {
         className={classes.slider}
       />
 
-       
+
     )
   }
 }

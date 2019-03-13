@@ -1,4 +1,4 @@
-import { MONGODB_URL } from 'babel-dotenv';
+import { MONGODB_URL } from '@env';
 let mongoose = require('mongoose');
 
 //TODO- use proper self-hosted prod mongoDB

@@ -1,9 +1,9 @@
 import axios from 'axios';
 import qs from 'qs';
-import { SPOTIFY_TOKEN_URL, 
+import { SPOTIFY_TOKEN_URL,
     SPOTIFY_WEB_API_BASE_URL,
     SPOTIFY_CLIENT_ID,
-    SPOTIFY_CLIENT_SECRET } from 'babel-dotenv';
+    SPOTIFY_CLIENT_SECRET } from '@env';
 import { runInNewContext } from 'vm';
 
 const auth = 'Basic ' + Buffer.from(SPOTIFY_CLIENT_ID + ':' + SPOTIFY_CLIENT_SECRET).toString('base64');
@@ -14,7 +14,7 @@ export default class SpotifyModel {
         this.token = "";
         this.tokenExpiry = Date.now();
     }
-   
+
     async _getToken(){
         let res =null;
         try{
@@ -29,7 +29,7 @@ export default class SpotifyModel {
                         'grant_type': 'client_credentials'
                     })
                 });
-       
+
         }
         catch(error){
             console.log(error);
@@ -40,7 +40,7 @@ export default class SpotifyModel {
     }
 
     async getTrackMetadata(trackId){
-        
+
         if(!this._isTokenValid()){
             let tokenRes = await this._getToken();
             this.token = tokenRes.data['access_token']
@@ -62,18 +62,18 @@ export default class SpotifyModel {
             console.log(error)
             throw new Error(error);
         }
-        
+
         return res;
     }
 
     async searchTracks(searchQuery, limit, offset){
-        
+
         if(!this._isTokenValid()){
             let tokenRes = await this._getToken();
             this.token = tokenRes.data['access_token']
             this.tokenExpiry = Date.now() + (parseInt(tokenRes.data['expires_in'] * 1000));
         }
-         
+
         let res = null;
         try {
             res = await axios({
@@ -90,7 +90,7 @@ export default class SpotifyModel {
             console.log(error)
             throw new Error(error);
         }
-        
+
         return res;
     }
 

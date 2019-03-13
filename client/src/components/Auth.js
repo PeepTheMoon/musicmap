@@ -5,7 +5,6 @@ import { Redirect } from 'react-router-dom';
 import queryString from 'query-string';
 import Login from './Login';
 import Signup from './Signup';
-import Logout from './Logout'
 import './Login.css';
 
 class Auth extends Component {
@@ -26,10 +25,10 @@ class Auth extends Component {
     }
 
     activeFormToggler() {
-        if (this.state.activeForm == "login") {
+        if (this.state.activeForm === "login") {
             this.setState({ activeForm: "signup" });
         }
-        else if (this.state.activeForm == "signup") {
+        else if (this.state.activeForm === "signup") {
             this.setState({ activeForm: "login" });
         }
     }
@@ -44,10 +43,10 @@ class Auth extends Component {
             }
         }
 
-        if (this.state.activeForm == "login") {
+        if (this.state.activeForm === "login") {
             return (<Login toggler={this.activeFormToggler} />);
         }
-        else if (this.state.activeForm == "signup") {
+        else if (this.state.activeForm === "signup") {
             return (<Signup toggler={this.activeFormToggler} />);
         }
     }

@@ -7,7 +7,23 @@
     }
     ]
     ],
-    "plugins": [["babel-plugin-dotenv", {
-        "replacedModuleName": "babel-dotenv"
-     }]]
+    "plugins": [
+        [
+            "babel-plugin-dotenv", {
+                "replacedModuleName": "babel-dotenv",
+                "allowUndefined": true
+            }
+        ],
+        [
+            "dotenv-import",
+            {
+              "moduleName": "@env",
+              "path": ".env",
+              "blacklist": null,
+              "whitelist": null,
+              "safe": false,
+              "allowUndefined": true
+            }
+        ]
+    ]
 }

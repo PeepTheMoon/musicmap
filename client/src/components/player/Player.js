@@ -1,4 +1,4 @@
-import React, { Component, createElement } from 'react'
+import { Component, createElement } from 'react'
 import PropTypes from 'prop-types'
 import contextTypes from './context-types'
 import getVendor from './utils/get-vendor'
@@ -93,7 +93,7 @@ class Player extends Component {
   }
 
   _handleOnReady = () => {
-    const { media, _mediaSetters } = this.context
+    const { media } = this.context
     const { autoPlay, onReady } = this.props
 
     if (!this._defaultsSet) {

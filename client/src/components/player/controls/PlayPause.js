@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import withMediaProps from '../decorators/with-media-props';
 import { IconButton, SvgIcon } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
@@ -27,19 +26,10 @@ class PlayPause extends Component {
   }
 
   render() {
-      {/* <button
-        type="button"
-        className={className}
-        style={style}
-        onClick={this._handlePlayPause}
-      >
-       
-      </button>
-     */}
-    const { classes, media, css } = this.props
+    const { classes, media } = this.props
     return (
         <>
-        {media.isPlaying ? 
+        {media.isPlaying ?
         (<IconButton aria-label="Pause">
         <SvgIcon onClick={this._handlePlayPause} className={classes.icon} color='secondary'>
           <path d="M13,16V8H15V16H13M9,16V8H11V16H9M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z"/>

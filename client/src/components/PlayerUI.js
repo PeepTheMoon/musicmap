@@ -1,21 +1,18 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
+import { StyleSheet, css } from 'aphrodite';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
-import {Paper, Grid, IconButton, SvgIcon, Avatar, Typography} from '@material-ui/core';
+import { Paper, Grid, IconButton } from '@material-ui/core';
 import { rotatein } from 'react-animations';
 import classNames from 'classnames';
-import { updateCurrentTrack } from '../actions/playerAction';
-
-
-const buttonGradientBackground = 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)';
+import { updateCurrentTrack, updatePlayerState } from '../actions/playerAction';
 
 const styles = theme => ({
   '@keyframes rotatein': rotatein,
   playerContainer: {
-    paddingTop: theme.spacing.unit,
-    paddingBottom: theme.spacing.unit,
-    height: theme.spacing.unit * 15,
+    backgroundColor: '#EDECEF',
+    height: '60px',
     width: '100%',
     position: 'fixed',
     bottom: 0,
@@ -28,25 +25,27 @@ const styles = theme => ({
   },
   playerTopControlsLeftContainer : {
     padding: '0',
-    flex: 1.5,
+    width: '90%',
+    marginTop: '-5px',
   },
   playerTopControlsRightContainer : {
     padding: '0',
-    flex: 1
+    width: '10%',
+    marginTop: '-5px',
   },
   playerBottomControlsContainer : {
     margin: '0 auto',
     padding: '0',
   },
   playerMainContainer: {
-    boxShadow: '1px 1px 1.5px 1px'
+    borderTop: '1px solid #C9C9C9',
   },
   ControlsMainContainer: {
-    height: theme.spacing.unit * 15,
-    flex: 3
+    height: '60px',
+    flex: 7
   },
   playerAlbumInfoContainer: {
-    height: theme.spacing.unit * 15,
+    height: '60px',
     flex: 1
   },
   albumThumbnailContainer: {
@@ -55,23 +54,14 @@ const styles = theme => ({
     marginRight: theme.spacing.unit * 2
   },
   playerTrackInfoContainer: {
-    flex: 3
+    width: '100%',
   },
   playerVolumeSlider: {
-    width: theme.spacing.unit * 8,
+    width: theme.spacing.unit * 20,
     height: theme.spacing.unit * 8
   },
   playerSeekbarSlider: {
     width: theme.spacing.unit * 50,
-    '&::-webkit-slider-thumb' : {
-    '-webkit-appearance': 'none',
-    appearance: 'none',
-    width: theme.spacing.unit * 20,
-    height: theme.spacing.unit * 10,
-    backgroundColor: 'secondary',
-    cursor: 'pointer'
-    }
-    
   },
   timer: {
     marginLeft: theme.spacing.unit,
@@ -79,7 +69,10 @@ const styles = theme => ({
     fontSize: theme.spacing.unit * 1.8
   },
   volumeItem: {
-    flex: 1
+    width: '15%',
+    [theme.breakpoints.down('lg')]: {
+      width: '10%',
+    },
   },
   albumThumbnail: {
     width: 80,
@@ -88,212 +81,407 @@ const styles = theme => ({
   albumAnimation: {
     animationName: 'rotatein',
     animationDuration: '0.2s',
-  }
+  },
+  playerTitle: {
+    fontWeight: 'bold',
+    fontSize: '12px',
+    width: '100%',
+    textAlign: 'left',
+    paddingLeft: '40px',
+  },
+  playerIcon: {
+    fontFamily: 'icomoon',
+    fontSize: '12px',
+    color: 'black',
+  },
+  rightPadding: {
+    paddingRight: '20px',
+  },
+  hamburgerPadding: {
+    paddingRight: '40px',
+  },
+  leftPadding: {
+    paddingLeft: '20px',
+  },
+  playerIconActive: {
+    fontFamily: 'icomoon',
+    fontSize: '12px',
+    color: '#f12034',
+  },
+  sliderItem: {
+    width: '50%',
+    marginTop: '-5px',
+    [theme.breakpoints.down('md')]: {
+      width: '30%',
+    },
+    [theme.breakpoints.down('sm')]: {
+      width: '10%',
+    },
+  },
 });
 
-class PlayerUI extends Component {  
-  constructor(props){
+class PlayerUI extends Component {
+  constructor(props) {
     super(props);
     this.state = {
       isPlaying: false,
-      isMuted: false,
-      props: this.props
+      timerId: 0,
+    };
+  }
+
+  componentWillMount() {
+    window.addEventListener('newTrackSelected', (e) => {
+      this.formatCurrentTime(0);
+      this._handlePause();
+      this._handlePlay(e.detail);
+    });
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('newTrackSelected');
+  }
+
+  _handlePlay = (track, resumePlay=false) => {
+    const {
+      play,
+      resume,
+    } = this.props;
+
+    resumePlay ? resume() : play(track.trackId);
+
+    const timerId = setInterval(() => {
+      const { player, isRepeat } = this.props;
+      const { isPlaying } = this.state;
+
+      player.getCurrentState().then((state) => {
+        if (state) {
+          // state.position in ms
+          this.formatCurrentTime(Math.round(state.position / 1000));
+
+          if (isPlaying && state.position === 0 && state.paused) {
+            if (isRepeat) {
+              this.formatCurrentTime(0);
+              this._handlePause();
+              this._handlePlay(track);
+            } else {
+              this._handleNext();
+            }
+          } else if (isPlaying && state.paused) {
+            this._handlePause();
+          }
+        }
+      });
+    }, 1000);
+
+    this.setState({
+      timerId,
+      isPlaying: true,
+    })
+  }
+
+  _handleNext = () => {
+    const { next } = this.props;
+    const { isPlaying } = this.state;
+
+    const nextTrack = next();
+    this.formatCurrentTime(0);
+
+    if (isPlaying) {
+      this._handlePause();
+      this._handlePlay(nextTrack);
     }
   }
 
-  _handlePlay(){
-    this.props.play(this.props.currentTrack.trackId.spotify);
+  _handlePrev = () => {
+    const { prev } = this.props;
+    const { isPlaying } = this.state;
+
+    const prevTrack = prev();
+    this.formatCurrentTime(0);
+
+    if (isPlaying) {
+      this._handlePause();
+      this._handlePlay(prevTrack);
+    }
+  }
+
+  _handleShuffle = () => {
+    const { toggleShuffle } = this.props;
+    toggleShuffle();
+  }
+
+  _handleRepeat = () => {
+    const { toggleRepeat } = this.props;
+    toggleRepeat();
+  }
+
+  _handlePause = () => {
+    const {
+      pause,
+    } = this.props;
+
+    pause();
+
+    clearInterval(this.state.timerId);
+
     this.setState({
-      isPlaying: true
+      isPlaying: false,
     })
   }
 
-  _handlePause(){
-    this.props.pause();
-    this.setState({
-      isPlaying: false
-    })
+  handleVolumeChange = (e) => {
+    const {
+      volume,
+    } = this.props;
+
+    volume(e.target.value);
   }
 
+  handleSliderChange = (position) => {
+    const {
+      seek,
+    } = this.props;
+    const sliderAmount = Number(position);
+
+    seek(sliderAmount);
+
+    this.formatCurrentTime(sliderAmount);
+  }
+
+  _handleMuteUnmute = () => {
+    const { muteUnmute } = this.props;
+    muteUnmute();
+  }
+
+  formatCurrentTime = (sliderAmount) => {
+    const { updatePlayerState } = this.props;
+    const currentMinutes = Math.floor(sliderAmount / 60);
+    const currentSeconds = sliderAmount % 60;
+    const currentTime = this.strPadLeft(currentMinutes,'0', 2) + ':' + this.strPadLeft(currentSeconds,'0', 2);
+
+    updatePlayerState({
+      currentTime,
+      sliderAmount,
+    });
+  }
+
+  strPadLeft = (string,pad, length) => {
+    return (new Array(length+1).join(pad)+string).slice(-length);
+  }
 
   render() {
-    const { classes } = this.props;
+    const {
+      classes,
+      currentTrack,
+      currentTime,
+      sliderAmount,
+      isMuted,
+      isShuffle,
+      isRepeat,
+      volumeAmount: volumePercent,
+    } = this.props;
+
+    const {
+      isPlaying,
+    } = this.state;
+
+    if (!currentTrack.trackId) {
+      return null;
+    }
+
+    const duration = currentTrack.duration.split(":");
+    const totalSeconds = (+duration[0]) * 60 + (+duration[1]);
+    const sliderPercent = sliderAmount/totalSeconds * 100.;
+
+    const rangeStyles = StyleSheet.create({
+      sliderStyles: {
+        backgroundImage: `
+          -webkit-gradient(linear, left top, right top, color-stop(${sliderPercent}%, #4F4F4F), color-stop(${sliderPercent}%, #FFFFFF));
+          -moz-linear-gradient(left center, #4F4F4F 0%, #4F4F4F ${sliderPercent}%, #FFFFFF ${sliderPercent}%, #FFFFFF 100%)`,
+        width: '100%',
+      },
+      volumeStyles: {
+        width: '100%',
+        maxWidth: '100px',
+        backgroundImage: `
+          -webkit-gradient(linear, left top, right top, color-stop(${volumePercent}%, #4F4F4F), color-stop(${volumePercent}%, #FFFFFF));
+          -moz-linear-gradient(left center, #4F4F4F 0%, #4F4F4F ${volumePercent}%, #FFFFFF ${volumePercent}%, #FFFFFF 100%)`,
+      },
+    });
 
     return (
-        <Paper className={classes.playerContainer} elevation={0}>
-         
-           <div>
+      <Paper className={classes.playerContainer} elevation={0}>
+        <div>
          {/****** main player container *******/}
-         <Grid container
-          className={classes.playerMainContainer}
-          direction='row' 
-          justify='center'
-          alignItems='center'>
           <Grid container
-           className={classes.playerAlbumInfoContainer} 
-           justify='center'
-           alignItems='center'>
-            <Grid item className={classes.albumThumbnailContainer} >
-              <Avatar alt={this.props.currentTrack.album} 
-              src={this.props.currentTrack.albumThumbnail} 
-              className={classNames(classes.albumThumbnail, classes.albumAnimation)} />
+            className={classes.playerMainContainer}
+            direction='row'
+            justify='center'
+            alignItems='center'
+          >
+            <Grid container
+              className={classes.playerAlbumInfoContainer}
+              justify='center'
+              alignItems='center'
+            >
+              <Grid container
+                className={classes.playerTrackInfoContainer}
+                direction='column'
+                justify='center'
+                alignItems='flex-start'
+              >
+                <div className={classes.playerTitle}>
+                  {currentTrack.title} - {currentTrack.artists}
+                </div>
+              </Grid>
             </Grid>
             <Grid container
-            className={classes.playerTrackInfoContainer} 
-            direction='column'
-            justify='center'
-            alignItems='flex-start'>
-              <Grid item>
-                <Typography variant="title">
-                  {this.props.currentTrack.title}
-                </Typography>
-              </Grid>
-              <Grid item>
-                <Typography variant="subheading">
-                  {this.props.currentTrack.artist}
-                </Typography>
-              </Grid>
-              <Grid item>
-                <Typography variant="subheading">
-                  {this.props.currentTrack.year}
-                </Typography>
-              </Grid>
-            </Grid>
-          </Grid>
-          <Grid container 
-         className={classes.ControlsMainContainer} 
-         direction='column'
-         justify='center'
-         alignItems='center'>
-            <Grid container 
-              className={classes.playerTopControlsContainer}
+              className={classes.ControlsMainContainer}
+              direction='column'
               justify='center'
-              direction='row'
-              alignItems='center'>
-              <Grid container 
-              className={classes.playerTopControlsLeftContainer}
-              justify='flex-end'
               alignItems='center'
-              direction='row'>
-              <Grid item>
-                <IconButton aria-label="Shuffle" >
-                  <SvgIcon className={classes.icon} color='secondary'>
-                    <path d="M14.83,13.41L13.42,14.82L16.55,17.95L14.5,20H20V14.5L17.96,16.54L14.83,13.41M14.5,4L16.54,6.04L4,18.59L5.41,20L17.96,7.46L20,9.5V4M10.59,9.17L5.41,4L4,5.41L9.17,10.58L10.59,9.17Z"/>
-                  </SvgIcon>
-                </IconButton>
-              </Grid>
-              <Grid item>
-                <IconButton aria-label="Previous" >
-                  <SvgIcon className={classes.icon} color='secondary'>
-                    <path d="M6,18V6H8V18H6M9.5,12L18,6V18L9.5,12Z"/>
-                  </SvgIcon>
-                </IconButton>
-              </Grid>
-              <Grid item>
-                {this.state.isPlaying ? 
-                    (<IconButton aria-label="Pause">
-                    <SvgIcon onClick={this._handlePause.bind(this)} className={classes.icon} color='secondary'>
-                      <path d="M13,16V8H15V16H13M9,16V8H11V16H9M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z"/>
-                    </SvgIcon>
-                  </IconButton>)
-                  : (
-                    <IconButton aria-label="Play">
-                    <SvgIcon onClick={this._handlePlay.bind(this)} className={classes.icon} color='secondary'>
-                      <path d="M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M10,16.5L16,12L10,7.5V16.5Z" />
-                    </SvgIcon>
-                  </IconButton>
-                  )
-                }
-              </Grid>
-              <Grid item>
-                <IconButton aria-label="Next" >
-                  <SvgIcon onClick={this.props.updateCurrentTrack} className={classes.icon} color='secondary'>
-                    <path d="M16,18H18V6H16M6,18L14.5,12L6,6V18Z"/>
-                  </SvgIcon>
-                </IconButton>
-              </Grid>
-              <Grid item>
-                <IconButton aria-label="Loop" >
-                  <SvgIcon className={classes.icon} color='secondary'>
-                    <path d="M9,14V21H2V19H5.57C4,17.3 3,15 3,12.5A9.5,9.5 0 0,1 12.5,3A9.5,9.5 0 0,1 22,12.5A9.5,9.5 0 0,1 12.5,22H12V20H12.5A7.5,7.5 0 0,0 20,12.5A7.5,7.5 0 0,0 12.5,5A7.5,7.5 0 0,0 5,12.5C5,14.47 5.76,16.26 7,17.6V14H9Z"/>
-                  </SvgIcon>
-                </IconButton>
-              </Grid>
-            </Grid>
-              <Grid container 
-              className={classes.playerTopControlsRightContainer}
-              justify='flex-start'
-              alignItems='center'
-              direction='row'
+            >
+              <Grid container
+                className={classes.playerTopControlsContainer}
+                justify='center'
+                direction='row'
+                alignItems='center'
               >
-            <Grid item className={classes.volume}>
-              {this.state.isMuted ? 
-                (<IconButton aria-label="Mute" >
-                <SvgIcon onClick={this._handleMuteUnmute} color='secondary' className={classes.icon}>
-                <path d="M12,4L9.91,6.09L12,8.18M4.27,3L3,4.27L7.73,9H3V15H7L12,20V13.27L16.25,17.53C15.58,18.04 14.83,18.46 14,18.7V20.77C15.38,20.45 16.63,19.82 17.68,18.96L19.73,21L21,19.73L12,10.73M19,12C19,12.94 18.8,13.82 18.46,14.64L19.97,16.15C20.62,14.91 21,13.5 21,12C21,7.72 18,4.14 14,3.23V5.29C16.89,6.15 19,8.83 19,12M16.5,12C16.5,10.23 15.5,8.71 14,7.97V10.18L16.45,12.63C16.5,12.43 16.5,12.21 16.5,12Z" />
-                </SvgIcon>
-              </IconButton>) 
-              :
-              (<IconButton aria-label="Unmute" >
-              <SvgIcon onClick={this._handleMuteUnmute} color='secondary' className={classes.icon}>
-              <path d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.84 14,18.7V20.77C18,19.86 21,16.28 21,12C21,7.72 18,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16C15.5,15.29 16.5,13.76 16.5,12M3,9V15H7L12,20V4L7,9H3Z" />
-              </SvgIcon>
-              </IconButton>)  
-              }
-            </Grid>
-            <Grid item className={classes.volume}>
+                <Grid container
+                  className={classes.playerTopControlsLeftContainer}
+                  justify='center'
+                  alignItems='center'
+                  direction='row'
+                >
+                  <Grid item>
+                    <IconButton aria-label="Previous" onClick={this._handlePrev}>
+                      <div className={classNames(classes.playerIcon, 'icon-mm-icon-previous')} />
+                    </IconButton>
+                  </Grid>
+                  <Grid item>
+                    {isPlaying ?
+                        (
+                          <IconButton aria-label="Pause" onClick={this._handlePause}>
+                            <div className={classNames(classes.playerIcon, 'icon-mm-icon-pause')} />
+                          </IconButton>
+                        ) : (
+                          <IconButton aria-label="Play" onClick={() => this._handlePlay(currentTrack, true)}>
+                            <div className={classNames(classes.playerIcon, 'icon-mm-icon-play')} />
+                          </IconButton>
+                        )
+                    }
+                  </Grid>
+                  <Grid item className={classNames(classes.rightPadding)}>
+                    <IconButton aria-label="Next" onClick={this._handleNext}>
+                      <div className={classNames(classes.playerIcon, 'icon-mm-icon-next')} />
+                    </IconButton>
+                  </Grid>
+
+                  <Grid item>
+                    <p className={classes.timer}>{currentTime} </p>
+                  </Grid>
+                  <Grid item className={classes.sliderItem}>
                     <input
-                type="range"
-                step="any"
-                min={0}
-                max={1}
-                value={0.5}
-                onChange={this.props.volume}
-                className={classes.playerVolumeSlider}
-              />
-            </Grid>
-            </Grid>
-            </Grid>
-            <Grid container 
-            className={classes.playerBottomControlsContainer}
-            justify='center'
-            alignItems='center'>
-            <Grid item>
-              <Typography variant="body2" component="p" className={classes.timer}>0:00 </Typography>
-            </Grid>
-            <Grid item>
-                <input
-                    type="range"
-                    step="any"
-                    max={100}
-                    value={10}
-                    className={classes.playerSeekbarSlider}
-              />
-            </Grid>
-            <Grid item>
-              <Typography variant="body2" component="p" className={classes.timer}> 12:00</Typography>
+                      type="range"
+                      step={1}
+                      max={totalSeconds}
+                      value={sliderAmount}
+                      onChange={(e) => this.handleSliderChange(e.target.value)}
+                      className={css(rangeStyles.sliderStyles)}
+                    />
+                  </Grid>
+                  <Grid item>
+                    <p className={classes.timer}> {currentTrack.duration}</p>
+                  </Grid>
+                  <Grid item className={classes.leftPadding}>
+                    <IconButton aria-label="Loop" onClick={this._handleRepeat}>
+                      <div
+                        className={classNames(isRepeat ? classes.playerIconActive : classes.playerIcon, 'icon-mm-icon-repeat')}
+                      />
+                    </IconButton>
+                  </Grid>
+                  <Grid item>
+                    <IconButton aria-label="Shuffle" onClick={this._handleShuffle}>
+                      <div
+                        className={classNames(isShuffle ? classes.playerIconActive : classes.playerIcon, 'icon-mm-icon-shuffle')}
+                      />
+                    </IconButton>
+                  </Grid>
+
+                  <Grid item className={classes.volume}>
+                    {!isMuted ?
+                      (
+                        <IconButton aria-label="Mute" onClick={this._handleMuteUnmute}>
+                          <div className={classNames(classes.playerIcon, 'icon-mm-icon-volume')} />
+                        </IconButton>
+                      ) : (
+                        <IconButton aria-label="Unmute" onClick={this._handleMuteUnmute}>
+                          <div className={classNames(classes.playerIcon, 'icon-mm-icon-mute')} />
+                        </IconButton>
+                      )
+                    }
+                  </Grid>
+                  <Grid
+                    item
+                    className={classes.volumeItem}
+                  >
+                    <input
+                      type="range"
+                      step={0.01}
+                      min={0}
+                      max={100}
+                      value={volumePercent}
+                      onChange={this.handleVolumeChange}
+                      className={css(rangeStyles.volumeStyles)}
+                    />
+                  </Grid>
+                </Grid>
+                <Grid container
+                  className={classes.playerTopControlsRightContainer}
+                  justify='flex-end'
+                  alignItems='center'
+                  direction='row'
+                 >
+                  <Grid className={classes.hamburgerPadding}>
+                    <IconButton aria-label="More">
+                      <div className={classNames(classes.playerIcon, 'icon-mm-icon-hamburger')} />
+                    </IconButton>
+                  </Grid>
+                </Grid>
+              </Grid>
             </Grid>
           </Grid>
-         </Grid>
-        </Grid>
-      
         </div>
- 
-    </Paper>
-  
+      </Paper>
     );
   }
-  
 }
 
 const mapStateToProps = state => ({
-    currentTrack: state.player.currentTrack
+  currentTrack: state.player.currentTrack,
+  currentTime: state.player.currentTime,
+  sliderAmount: state.player.sliderAmount,
+  player: state.player.player,
 })
 
 PlayerUI.propTypes = {
   classes: PropTypes.object.isRequired,
   currentTrack: PropTypes.object.isRequired,
-  updateCurrentTrack:  PropTypes.func
+  playerType: PropTypes.string,
+  play: PropTypes.func,
+  player: PropTypes.object,
+  pause: PropTypes.func,
+  volume: PropTypes.func,
+  next: PropTypes.func,
+  prev: PropTypes.func,
+  resume: PropTypes.func,
+  toggleShuffle: PropTypes.func,
+  toggleRepeat: PropTypes.func,
+  muteUnmute: PropTypes.func,
+  isPlaying: PropTypes.bool,
+  isMuted: PropTypes.bool,
+  isShuffle: PropTypes.bool,
+  isRepeat: PropTypes.bool,
 };
 
-export default connect(mapStateToProps, { updateCurrentTrack })(withStyles(styles)(PlayerUI));
+export default withStyles(styles)(connect(mapStateToProps, { updateCurrentTrack, updatePlayerState })(PlayerUI));

@@ -43,7 +43,7 @@ class Profile extends Component {
             this.state.oldPassword &&                               // old password is entered
             this.state.newPassword &&                               // new password is entered
             this.state.repeatPassword &&                            // password is repeated
-            this.state.newPassword == this.state.repeatPassword     // repeated password is same as the password
+            this.state.newPassword === this.state.repeatPassword     // repeated password is same as the password
         );
 
         if (this.state.passwordChanged) {
@@ -79,9 +79,8 @@ class Profile extends Component {
                         />
                         {this.state.repeatPassword &&
                             <div
-                                className="form-item-footer"
-                                className={this.state.password == this.state.repeatPassword ? "form-item-footer success" : "form-item-footer failure"}
-                            >{this.state.password == this.state.repeatPassword ? "Passwords match" : "Passwords do not match"}</div>
+                                className={this.state.password === this.state.repeatPassword ? "form-item-footer success" : "form-item-footer failure"}
+                            >{this.state.password === this.state.repeatPassword ? "Passwords match" : "Passwords do not match"}</div>
                         }
                         <input
                             className="form-submit"
